@@ -927,3 +927,25 @@ html, body {
 #app {
   overflow-x: hidden;
 }
+
+@media (max-width: 480px) {
+  /* Título de Cómo funciona */
+  #como-funciona h2 {
+    font-size: 2.8rem;
+  }
+
+  /* Título de El álbum por dentro */
+  #el-album h2 {
+    font-size: 2.8rem;
+  }
+
+  /* Título del FAQ */
+  #faq h2 {
+    font-size: 2.8rem;
+  }
+
+  /* Título del formulario */
+  #pedir h2 {
+    font-size: 2.8rem;
+  }
+}
