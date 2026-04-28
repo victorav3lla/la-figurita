@@ -25,7 +25,7 @@ export default async function handler(req, res) {
 
     // --- Correo para ti ---
     await resend.emails.send({
-      from: 'La Figurita <onboarding@resend.dev>',
+      from: 'La Figurita <hola@lafigurita.com>',
       to: [process.env.NOTIFY_EMAIL],
       subject: `📦 Nuevo pedido — ${name} · ${batch?.label ?? batch_id}`,
       html: `
@@ -88,7 +88,7 @@ export default async function handler(req, res) {
       : 'Te escribiremos por WhatsApp en menos de 24 horas para confirmar los detalles y coordinar el pago.'
 
     await resend.emails.send({
-      from: 'La Figurita <onboarding@resend.dev>',
+      from: 'La Figurita <hola@lafigurita.com>',
       to: [email],
       subject: `¡Recibimos tu pedido! — La Figurita · ${batch?.label ?? ''}`,
       html: `
