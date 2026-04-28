@@ -42,8 +42,8 @@ export function footer() {
                 </a>
               </li>
               <li>
-                <a href="mailto:hola@lafigurita.co" class="hover:text-tomato transition">
-                  hola@lafigurita.co
+                <a href="mailto:lafigurita@gmail.com" class="hover:text-tomato transition">
+                  lafigurita@gmail.com
                 </a>
               </li>
               <li>
