@@ -909,3 +909,11 @@ body {
   color: var(--color-ink-soft);
   margin-top: 16px;
 }
+
+
+@media (max-width: 768px) {
+  .album-stage {
+    max-width: 220px;
+    margin: 72px auto 0 auto;
+  }
+}
