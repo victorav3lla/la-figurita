@@ -917,3 +917,13 @@ body {
     margin: 72px auto 0 auto;
   }
 }
+
+/* Evitar overflow horizontal en móvil */
+html, body {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
+#app {
+  overflow-x: hidden;
+}
