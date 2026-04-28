@@ -84,7 +84,7 @@ export function hero() {
                 <div class="album-shadow"></div>
                 <div class="album">
                   <img
-                    src="/public/album-papa.png"
+                    src="/public/images/album-papa.png"
                     alt="Álbum personalizado La Figurita - Edición Papá"
                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
                   />
