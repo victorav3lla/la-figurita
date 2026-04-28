@@ -19,9 +19,6 @@ export function validateField(field) {
     case 'photos_link':
       if (!/^https?:\/\/.+/.test(value)) return 'Debe ser un link válido (https://...).'
       break
-    case 'dedication':
-      if (value.length > 15) return 'Máximo 15 caracteres.'
-      break
     case 'quantity':
       const n = parseInt(value, 10)
       if (isNaN(n) || n < 1 || n > 10) return 'Entre 1 y 10.'

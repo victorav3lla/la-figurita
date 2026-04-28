@@ -2,8 +2,8 @@ export function howItWorks() {
   const steps = [
     {
       number: '01',
-      title: 'Eliges tu dedicatoria',
-      description: 'Decides para quién es: papá, mamá, abuela, o el nombre que quieras en la portada.',
+      title: 'Eliges tu álbum',
+      description: 'El regalo perfecto para papá.',
       color: 'tomato',
       icon: heartIcon()
     },
@@ -92,9 +92,11 @@ function cameraIcon() {
   return `
     <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
       <rect x="3" y="9" width="26" height="18" rx="2"
-            fill="white" stroke="white" stroke-width="2" stroke-linejoin="round"/>
-      <path d="M11 9l2-3h6l2 3" stroke="white" stroke-width="2" stroke-linejoin="round" fill="white"/>
-      <circle cx="16" cy="18" r="5" fill="none" stroke="currentColor" stroke-width="2"/>
+            fill="grey" stroke="black" stroke-width="2" stroke-linejoin="round"/>
+      <path d="M11 9l2-3h6l2 3"
+            stroke="black" stroke-width="2" stroke-linejoin="round" fill="white"/>
+      <circle cx="16" cy="18" r="5"
+            fill="none" stroke="rgba(0,0,0,0.25)" stroke-width="2"/>
     </svg>
   `
 }

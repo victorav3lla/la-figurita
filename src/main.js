@@ -2,6 +2,7 @@ import './style.css'
 import { hero } from './sections/hero.js'
 import { howItWorks } from './sections/how-it-works.js'
 import { insideAlbum } from './sections/inside-album.js'
+import { batchesSection } from './sections/batches.js'
 import { faq } from './sections/faq.js'
 import { footer } from './sections/footer.js'
 import { orderForm } from './form/form.js'
@@ -13,6 +14,7 @@ app.innerHTML = `
   ${hero()}
   ${howItWorks()}
   ${insideAlbum()}
+  ${batchesSection()}
   ${faq()}
   ${orderForm()}
   ${footer()}

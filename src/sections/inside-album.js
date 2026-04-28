@@ -3,8 +3,8 @@ export function insideAlbum() {
     {
       number: '01',
       label: 'Portada',
-      title: 'Tu dedicatoria.\nTu nombre.',
-      description: 'Eliges la palabra de portada — DAD, MOM, ABUELA, o el nombre que quieras. La diseñamos en grande, estilo álbum coleccionable.',
+      title: 'Edición\nDAD.',
+      description: 'Diseño coleccionable estilo Panini, edición especial para papá. Portada única, impresa en alta calidad.',
       color: 'tomato',
       visual: coverVisual()
     },
@@ -71,12 +71,12 @@ export function insideAlbum() {
         <!-- Specs strip -->
         <div class="mt-16 md:mt-20 specs-strip">
           ${[
-            { label: 'Páginas', value: '16' },
-            { label: 'Láminas', value: '40' },
-            { label: 'Verticales', value: '32' },
-            { label: 'Horizontales', value: '8' },
-            { label: 'Formato', value: 'A5' }
-          ].map(s => `
+      { label: 'Páginas', value: '16' },
+      { label: 'Láminas', value: '40' },
+      { label: 'Verticales', value: '32' },
+      { label: 'Horizontales', value: '8' },
+      { label: 'Formato', value: 'A5' }
+    ].map(s => `
             <div class="spec-item">
               <p class="font-display font-black text-4xl md:text-5xl text-ink leading-none">${s.value}</p>
               <p class="text-xs uppercase tracking-wider text-ink-soft mt-2">${s.label}</p>

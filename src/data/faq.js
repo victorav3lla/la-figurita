@@ -9,7 +9,7 @@ export const faqs = [
   },
   {
     q: '¿Cuánto cuesta y cuánto es el envío?',
-    a: 'El álbum tiene un precio de $50.000 COP, y el envío depende de dirección de envío. En el formulario de pedido ves el total antes de cerrar.'
+    a: 'El álbum tiene un precio de $130.000 COP, y el envío depende de dirección de envío. En el formulario de pedido ves el total antes de cerrar.'
   },
   {
     q: '¿Hay descuento por pagar al instante?',
@@ -17,7 +17,7 @@ export const faqs = [
   },
   {
     q: '¿Cuánto se demora en llegar?',
-    a: 'Entre 7 y 10 días hábiles desde que confirmamos el pedido y recibimos tus fotos. Para fechas especiales pídelo con al menos dos semanas de anticipación.'
+    a: 'En Bogotá, de 5 a 7 días hábiles. Para el resto del país, de 7 a 10 días hábiles. Ten en cuenta que estos tiempos pueden variar según la temporada y la ubicación exacta.'
   },
   {
     q: '¿A qué ciudades envían?',
@@ -26,10 +26,6 @@ export const faqs = [
   {
     q: '¿Cómo es el método de pago?',
     a: 'Por transferencia bancaria, Nequi o Daviplata. Si eliges "pagar ahora", te enviamos los datos al confirmar el pedido. Si eliges WhatsApp, los coordinamos por chat.'
-  },
-  {
-    q: '¿Puedo cambiar la dedicatoria de portada?',
-    a: 'Sí, hasta antes de confirmar producción. Puedes poner DAD, MOM, ABUELA, o el nombre que quieras (máx. 15 caracteres).'
   },
   {
     q: '¿La sección de preguntas viene impresa o se llena a mano?',

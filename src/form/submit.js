@@ -1,5 +1,6 @@
 import { validateField, validateForm } from './validators.js'
 import { calculateTotal, formatCOP, SHIPPING_OPTIONS } from '../data/pricing.js'
+import { getBatch } from '../data/batches.js'
 
 export function setupForm() {
   const form = document.getElementById('order-form')
@@ -25,15 +26,21 @@ function setupValidation(form) {
 
 function setupPriceSummary(form) {
   const quantityInput = form.querySelector('#quantity')
-  const zoneSelect = form.querySelector('#shipping_zone')
-  const buttons = form.querySelectorAll('.payment-option')
+  const zoneSelect    = form.querySelector('#shipping_zone')
+  const buttons       = form.querySelectorAll('.payment-option')
+
+  function getSelectedBatch() {
+    const checked = form.querySelector('input[name="batch_id"]:checked')
+    return checked ? getBatch(checked.value) : null
+  }
 
   function update() {
     const quantity = parseInt(quantityInput.value, 10) || 0
-    const zone = zoneSelect.value
-    const ready = quantity > 0 && zone !== ''
+    const zone     = zoneSelect.value
+    const batch    = getSelectedBatch()
+    const ready    = quantity > 0 && zone !== '' && batch
 
-    const empty = form.querySelector('#price-summary-empty')
+    const empty   = form.querySelector('#price-summary-empty')
     const summary = form.querySelector('#price-summary')
 
     if (!ready) {
@@ -43,43 +50,34 @@ function setupPriceSummary(form) {
       return
     }
 
-    // Calcular dos versiones: con y sin descuento, para mostrar lo que ahorra el "pagar ahora"
-    const withDiscount = calculateTotal({ quantity, shippingZone: zone, payNow: true })
-    const withoutDiscount = calculateTotal({ quantity, shippingZone: zone, payNow: false })
+    const totals = calculateTotal({ quantity, shippingZone: zone, batchId: batch.id })
 
-    // Mostramos el total SIN descuento por defecto, y un sub-texto del precio con descuento
     form.querySelector('#summary-quantity').textContent = `(${quantity})`
-    form.querySelector('#summary-subtotal').textContent = formatCOP(withoutDiscount.subtotal)
-    form.querySelector('#summary-shipping').textContent = formatCOP(withoutDiscount.shipping)
+    form.querySelector('#summary-subtotal').textContent = formatCOP(totals.subtotal)
+    form.querySelector('#summary-shipping').textContent = formatCOP(totals.shipping)
 
     const zoneLabel = SHIPPING_OPTIONS.find(o => o.id === zone)?.label || ''
     form.querySelector('#summary-zone').textContent = `(${zoneLabel})`
 
-    form.querySelector('#summary-total').textContent = formatCOP(withoutDiscount.total)
-    form.querySelector('#summary-discount-row').hidden = true
+    const discountRow = form.querySelector('#summary-discount-row')
+    if (totals.discount > 0) {
+      discountRow.hidden = false
+      form.querySelector('#summary-discount').textContent = `−${formatCOP(totals.discount)}`
+    } else {
+      discountRow.hidden = true
+    }
 
-    // Mostrar el total con descuento dentro del botón de "Pagar ahora"
+    form.querySelector('#summary-total').textContent = formatCOP(totals.total)
+
+    // Actualizar precio en botón de pagar ahora
     const payNowBtn = form.querySelector('.payment-option-primary')
-    let payNowPrice = payNowBtn.querySelector('.payment-option-price')
-    if (!payNowPrice) {
-      payNowPrice = document.createElement('span')
-      payNowPrice.className = 'payment-option-price'
-      payNowBtn.querySelector('.payment-option-content').appendChild(payNowPrice)
+    let priceTag = payNowBtn.querySelector('.payment-option-price')
+    if (!priceTag) {
+      priceTag = document.createElement('span')
+      priceTag.className = 'payment-option-price'
+      payNowBtn.querySelector('.payment-option-content').appendChild(priceTag)
     }
-    payNowPrice.innerHTML = `
-      Total: <strong>${formatCOP(withDiscount.total)}</strong>
-      <span class="payment-option-strike">${formatCOP(withoutDiscount.total)}</span>
-    `
-
-    // Mostrar el total normal en el otro botón
-    const waBtn = form.querySelectorAll('.payment-option')[1]
-    let waPrice = waBtn.querySelector('.payment-option-price')
-    if (!waPrice) {
-      waPrice = document.createElement('span')
-      waPrice.className = 'payment-option-price'
-      waBtn.querySelector('.payment-option-content').appendChild(waPrice)
-    }
-    waPrice.innerHTML = `Total: <strong>${formatCOP(withoutDiscount.total)}</strong>`
+    priceTag.innerHTML = `Total: <strong>${formatCOP(totals.total)}</strong>`
 
     summary.classList.add('is-ready')
     empty.hidden = true
@@ -88,17 +86,18 @@ function setupPriceSummary(form) {
 
   quantityInput.addEventListener('input', update)
   zoneSelect.addEventListener('change', update)
+  form.querySelectorAll('input[name="batch_id"]').forEach(r => {
+    r.addEventListener('change', update)
+  })
+
   update()
 }
 
 function setupSubmit(form) {
   let chosenMethod = null
 
-  // Capturar qué botón disparó el submit
   form.querySelectorAll('button[type="submit"]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      chosenMethod = btn.value
-    })
+    btn.addEventListener('click', () => { chosenMethod = btn.value })
   })
 
   form.addEventListener('submit', async (e) => {
@@ -112,38 +111,43 @@ function setupSubmit(form) {
     if (!valid) {
       Object.entries(errors).forEach(([name, message]) => {
         const field = form.querySelector(`[name="${name}"]`)
-        showFieldError(field, message)
+        if (field) showFieldError(field, message)
       })
       firstErrorField?.focus()
       firstErrorField?.scrollIntoView({ behavior: 'smooth', block: 'center' })
       return
     }
 
-    // Loading: deshabilitar ambos botones y poner texto en el clickeado
     const allButtons = form.querySelectorAll('.payment-option')
     allButtons.forEach(b => b.disabled = true)
     const clickedBtn = form.querySelector(`button[value="${chosenMethod}"]`)
-    const originalContent = clickedBtn.innerHTML
     clickedBtn.innerHTML = '<span class="payment-option-loading">Enviando...</span>'
 
     try {
-      // SIMULACIÓN — reemplazar por fetch al backend
-      await new Promise(resolve => setTimeout(resolve, 1500))
-
       const data = collectFormData(form, chosenMethod)
-      console.log('Pedido a enviar:', data)
+
+      const response = await fetch('/api/order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      })
+
+      if (!response.ok) throw new Error('Error del servidor')
 
       showSuccess(form, chosenMethod)
     } catch (err) {
       allButtons.forEach(b => b.disabled = false)
-      clickedBtn.innerHTML = originalContent
+      clickedBtn.innerHTML = chosenMethod === 'pay_now'
+        ? '<div class="payment-option-content"><span class="payment-option-title">Pagar ahora</span></div><span class="payment-option-arrow">→</span>'
+        : '<div class="payment-option-content"><span class="payment-option-title">Cerrar por WhatsApp</span></div><span class="payment-option-arrow">→</span>'
       alert('Hubo un problema. Intenta de nuevo o escríbenos por WhatsApp.')
     }
   })
 }
 
 function showFieldError(field, message) {
-  const errorEl = field.closest('.form-field')?.querySelector('.form-error')
+  const errorEl = field.closest('.form-field, fieldset')?.querySelector(`.form-error[data-error-for="${field.name}"]`)
+    || field.closest('.form-field')?.querySelector('.form-error')
   if (!errorEl) return
 
   if (message) {
@@ -163,8 +167,8 @@ function collectFormData(form, paymentMethod) {
 
   const quantity = parseInt(data.quantity, 10) || 0
   const zone = data.shipping_zone
-  const totals = calculateTotal({ quantity, shippingZone: zone, payNow: paymentMethod === 'pay_now' })
-  data.totals = totals
+  const batchId = data.batch_id
+  data.totals = calculateTotal({ quantity, shippingZone: zone, batchId })
 
   return data
 }
@@ -173,11 +177,9 @@ function showSuccess(form, method) {
   const success = form.querySelector('#form-success')
   const text = form.querySelector('#form-success-text')
 
-  if (method === 'pay_now') {
-    text.textContent = 'En breve te enviamos los datos de pago por correo y WhatsApp. Una vez confirmado el pago, iniciamos producción.'
-  } else {
-    text.textContent = 'Te escribimos por WhatsApp en menos de 24 horas para confirmar detalles y coordinar el pago.'
-  }
+  text.textContent = method === 'pay_now'
+    ? 'En breve te enviamos los datos de pago por correo y WhatsApp. Una vez confirmado el pago, iniciamos producción.'
+    : 'Te escribimos por WhatsApp en menos de 24 horas para confirmar detalles y coordinar el pago.'
 
   Array.from(form.children).forEach(child => {
     if (child !== success) child.style.display = 'none'
