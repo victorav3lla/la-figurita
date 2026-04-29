@@ -1,7 +1,5 @@
 const slides = [
   { src: '/images/album-papa.png',   alt: 'Portada del álbum' },
-  { src: '/images/album-page-1.jpg', alt: 'Página interior 1' },
-  { src: '/images/album-page-2.jpg', alt: 'Página interior 2' },
   { src: '/images/album-page-3.jpg', alt: 'Página interior 3' },
 ]
 
