@@ -42,14 +42,8 @@ export function footer() {
                 </a>
               </li>
               <li>
-                <a href="mailto:lafigurita@gmail.com" class="hover:text-tomato transition">
-                  lafigurita@gmail.com
-                </a>
-              </li>
-              <li>
-                <a href="https://instagram.com/lafigurita" target="_blank" rel="noopener" class="hover:text-tomato transition inline-flex items-center gap-2">
-                  Instagram
-                  <span aria-hidden="true">↗</span>
+                <a href="mailto:hola@lafigurita.com" class="hover:text-tomato transition">
+                  hola@lafigurita.com
                 </a>
               </li>
             </ul>
@@ -60,7 +54,7 @@ export function footer() {
         <!-- Bottom -->
         <div class="pt-8 border-t border-cream/10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 text-sm text-cream/60">
           <p>© ${year} La Figurita. Hecho con cariño en Bogotá.</p>
-          <p>Álbumes coleccionables personalizados.</p>
+          <p>Diseño web de <a href="https://victorav3lla.github.io/portfolio/" target="_blank" rel="noopener" class="hover:text-tomato transition">VaV3lCod3</a>.</p>
         </div>
 
       </div>
