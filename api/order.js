@@ -56,7 +56,7 @@ export default async function handler(req, res) {
             Álbumes coleccionables personalizados
           </div>
         </div>
-      </div>
+
           <h3>Datos del cliente</h3>
           <table style="width:100%;border-collapse:collapse;">
             <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:600;width:140px;">Nombre</td><td style="padding:8px;border-bottom:1px solid #eee;">${name}</td></tr>
@@ -123,7 +123,6 @@ export default async function handler(req, res) {
               timeZone: 'America/Bogota',
             })}
           </p>
-        </div>
 
       <!-- Footer -->
       <div style="margin-top:40px;padding-top:24px;border-top:2px solid #F7EFE0;text-align:center;">
@@ -149,6 +148,7 @@ export default async function handler(req, res) {
           <a href="mailto:hola@lafigurita.com"
             style="color:#6B5F54;text-decoration:none;">hola@lafigurita.com</a>
         </div>
+      </div>
       </div>
       `,
     });
@@ -179,7 +179,7 @@ export default async function handler(req, res) {
             ¡Gracias, ${name.split(' ')[0]}!
           </span>
         </div>
-    </div>
+      </div>
 
           <p style="font-size:16px;line-height:1.6;">
             Recibimos tu pedido del <strong>Álbum La Figurita — Edición DAD</strong>.
@@ -215,7 +215,6 @@ export default async function handler(req, res) {
           <p style="font-size:13px;color:#6B5F54;border-top:1px solid #eee;padding-top:16px;margin-top:24px;">
             La Figurita · Álbumes coleccionables personalizados · Bogotá, Colombia
           </p>
-        </div>
 
         <!-- Footer -->
       <div style="margin-top:40px;padding-top:24px;border-top:2px solid #F7EFE0;text-align:center;">
@@ -241,6 +240,7 @@ export default async function handler(req, res) {
           <a href="mailto:hola@lafigurita.com"
             style="color:#6B5F54;text-decoration:none;">hola@lafigurita.com</a>
         </div>
+      </div>
       </div>
       `,
     });
