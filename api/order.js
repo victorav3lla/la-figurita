@@ -124,6 +124,32 @@ export default async function handler(req, res) {
             })}
           </p>
         </div>
+
+                <!-- Footer -->
+          <div style="margin-top:40px;padding-top:24px;border-top:2px solid #F7EFE0;text-align:center;">
+      <div style="font-size:18px;font-weight:900;color:#0F0F0F;letter-spacing:-0.02em;margin-bottom:4px;">
+          La Figurita
+        </div>
+        <div style="font-size:12px;color:#6B5F54;margin-bottom:16px;">
+          Álbumes coleccionables personalizados · Bogotá, Colombia
+        </div>
+        <div style="display:flex;justify-content:center;gap:16px;margin-bottom:16px;">
+          <a href="https://wa.me/573013456789"
+            style="font-size:12px;color:#0F0F0F;font-weight:600;text-decoration:none;">
+            WhatsApp
+          </a>
+          <span style="color:#D9D9D9;">·</span>
+          <a href="https://lafigurita.com"
+            style="font-size:12px;color:#0F0F0F;font-weight:600;text-decoration:none;">
+            lafigurita.com
+          </a>
+        </div>
+        <div style="font-size:11px;color:#6B5F54;">
+          © ${new Date().getFullYear()} La Figurita ·
+          <a href="mailto:hola@lafigurita.com"
+            style="color:#6B5F54;text-decoration:none;">hola@lafigurita.com</a>
+        </div>
+      </div>
       `,
     });
 
@@ -190,6 +216,32 @@ export default async function handler(req, res) {
             La Figurita · Álbumes coleccionables personalizados · Bogotá, Colombia
           </p>
         </div>
+
+        <!-- Footer -->
+    <div style="margin-top:40px;padding-top:24px;border-top:2px solid #F7EFE0;text-align:center;">
+      <div style="font-size:18px;font-weight:900;color:#0F0F0F;letter-spacing:-0.02em;margin-bottom:4px;">
+        La Figurita
+      </div>
+      <div style="font-size:12px;color:#6B5F54;margin-bottom:16px;">
+        Álbumes coleccionables personalizados · Bogotá, Colombia
+      </div>
+      <div style="display:flex;justify-content:center;gap:16px;margin-bottom:16px;">
+        <a href="https://wa.me/573013456789"
+           style="font-size:12px;color:#0F0F0F;font-weight:600;text-decoration:none;">
+          WhatsApp
+        </a>
+        <span style="color:#D9D9D9;">·</span>
+        <a href="https://lafigurita.com"
+           style="font-size:12px;color:#0F0F0F;font-weight:600;text-decoration:none;">
+          lafigurita.com
+        </a>
+      </div>
+      <div style="font-size:11px;color:#6B5F54;">
+        © ${new Date().getFullYear()} La Figurita ·
+        <a href="mailto:hola@lafigurita.com"
+           style="color:#6B5F54;text-decoration:none;">hola@lafigurita.com</a>
+      </div>
+    </div>
       `,
     });
 
