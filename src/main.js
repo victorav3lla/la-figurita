@@ -7,6 +7,7 @@ import { faq } from './sections/faq.js'
 import { footer } from './sections/footer.js'
 import { orderForm } from './form/form.js'
 import { setupForm } from './form/submit.js'
+import { setupCarousel } from './components/album-carousel.js'
 
 const app = document.querySelector('#app')
 
@@ -21,3 +22,4 @@ app.innerHTML = `
 `
 
 setupForm()
+setupCarousel()

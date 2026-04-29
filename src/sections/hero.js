@@ -1,4 +1,5 @@
 import { animatedBg } from '../components/animated-bg.js'
+import { albumCarousel } from '../components/album-carousel.js'
 
 export function hero() {
   return `
@@ -15,8 +16,8 @@ export function hero() {
               La Figurita
             </a>
             <div class="hidden md:flex items-center gap-8 text-sm font-medium">
-              <a href="#ediciones" class="hover:text-tomato transition">Ediciones</a>
               <a href="#como-funciona" class="hover:text-tomato transition">Cómo funciona</a>
+              <a href="#el-album" class="hover:text-tomato transition">El álbum</a>
               <a href="#faq" class="hover:text-tomato transition">FAQ</a>
               <a href="#pedir" class="bg-ink text-cream px-5 py-2 rounded-full hover:bg-tomato transition">
                 Pedir
@@ -52,12 +53,12 @@ export function hero() {
                   Pedir el mío
                   <span aria-hidden="true">→</span>
                 </a>
-                <a href="#ediciones" class="font-display font-bold border-2 border-ink text-ink bg-cream/70 backdrop-blur-sm px-7 py-3.5 rounded-full hover:bg-sun transition">
-                  Ver ediciones
+                <a href="#el-album" class="font-display font-bold border-2 border-ink text-ink bg-cream/70 backdrop-blur-sm px-7 py-3.5 rounded-full hover:bg-sun transition">
+                  Ver el álbum
                 </a>
               </div>
 
-              <!-- Stats compactos -->
+              <!-- Stats -->
               <div class="grid grid-cols-4 gap-4 max-w-md">
                 <div>
                   <p class="font-display font-black text-3xl text-ink leading-none">16</p>
@@ -68,8 +69,8 @@ export function hero() {
                   <p class="text-[10px] uppercase tracking-wider text-ink-soft mt-1.5">Láminas</p>
                 </div>
                 <div>
-                  <p class="font-display font-black text-3xl text-ink leading-none">3</p>
-                  <p class="text-[10px] uppercase tracking-wider text-ink-soft mt-1.5">Ediciones</p>
+                  <p class="font-display font-black text-3xl text-ink leading-none">1</p>
+                  <p class="text-[10px] uppercase tracking-wider text-ink-soft mt-1.5">Edición</p>
                 </div>
                 <div>
                   <p class="font-display font-black text-3xl text-ink leading-none">∞</p>
@@ -78,22 +79,9 @@ export function hero() {
               </div>
             </div>
 
-            <!-- Columna derecha: álbum -->
+            <!-- Columna derecha: carrusel -->
             <div class="relative flex items-center justify-center">
-              <div class="album-stage">
-                <div class="album-shadow"></div>
-                <div class="album">
-                  <img
-                    src="/images/album-papa.png?v=1"
-                    alt="Álbum personalizado La Figurita - Edición Papá"
-                    onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
-                  />
-                  <div class="album-fallback" style="display: none;">
-                    <span class="font-display font-black">LA FIGURITA</span>
-                    <span class="album-fallback-sub">Tu álbum aquí</span>
-                  </div>
-                </div>
-              </div>
+              ${albumCarousel()}
             </div>
 
           </div>
