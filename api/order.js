@@ -42,21 +42,21 @@ export default async function handler(req, res) {
       to: [process.env.NOTIFY_EMAIL],
       subject: `📦 Nuevo pedido — ${name} · ${batch?.label ?? batch_id}`,
       html: `
-        <div style="font-family:sans-serif;max-width:600px;margin:0 auto;">
+      <div style="font-family:sans-serif;max-width:600px;margin:0 auto;">
 
-          <!-- Header de marca -->
-          <div style="background:#0F0F0F;border-radius:12px;padding:28px 32px;margin-bottom:24px;">
-            <div style="display:inline-block;background:#E63946;border-radius:6px;padding:4px 10px;margin-bottom:12px;">
-              <span style="color:white;font-size:11px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;">Nuevo pedido</span>
-            </div>
-            <div style="font-size:32px;font-weight:900;color:#FBF7EE;letter-spacing:-0.02em;line-height:1;">
-              La Figurita
-            </div>
-            <div style="font-size:13px;color:rgba(251,247,238,0.5);margin-top:6px;">
-              Álbumes coleccionables personalizados
-            </div>
+        <!-- Header de marca -->
+        <div style="background:#0F0F0F;border-radius:12px;padding:28px 32px;margin-bottom:24px;">
+          <div style="display:inline-block;background:#E63946;border-radius:6px;padding:4px 10px;margin-bottom:12px;">
+            <span style="color:white;font-size:11px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;">Nuevo pedido</span>
           </div>
-
+          <div style="font-size:32px;font-weight:900;color:#FBF7EE;letter-spacing:-0.02em;line-height:1;">
+            La Figurita
+          </div>
+          <div style="font-size:13px;color:rgba(251,247,238,0.5);margin-top:6px;">
+            Álbumes coleccionables personalizados
+          </div>
+        </div>
+      </div>
           <h3>Datos del cliente</h3>
           <table style="width:100%;border-collapse:collapse;">
             <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:600;width:140px;">Nombre</td><td style="padding:8px;border-bottom:1px solid #eee;">${name}</td></tr>
@@ -125,9 +125,9 @@ export default async function handler(req, res) {
           </p>
         </div>
 
-                <!-- Footer -->
-          <div style="margin-top:40px;padding-top:24px;border-top:2px solid #F7EFE0;text-align:center;">
-      <div style="font-size:18px;font-weight:900;color:#0F0F0F;letter-spacing:-0.02em;margin-bottom:4px;">
+      <!-- Footer -->
+      <div style="margin-top:40px;padding-top:24px;border-top:2px solid #F7EFE0;text-align:center;">
+        <div style="font-size:18px;font-weight:900;color:#0F0F0F;letter-spacing:-0.02em;margin-bottom:4px;">
           La Figurita
         </div>
         <div style="font-size:12px;color:#6B5F54;margin-bottom:16px;">
@@ -164,22 +164,22 @@ export default async function handler(req, res) {
       to: [email],
       subject: `¡Recibimos tu pedido! — La Figurita · ${batch?.label ?? ''}`,
       html: `
-  <div style="font-family:sans-serif;max-width:600px;margin:0 auto;">
+      <div style="font-family:sans-serif;max-width:600px;margin:0 auto;">
 
-    <!-- Header de marca -->
-    <div style="background:#0F0F0F;border-radius:12px;padding:28px 32px;margin-bottom:24px;">
-      <div style="font-size:32px;font-weight:900;color:#FBF7EE;letter-spacing:-0.02em;line-height:1;">
-        La Figurita
+      <!-- Header de marca -->
+      <div style="background:#0F0F0F;border-radius:12px;padding:28px 32px;margin-bottom:24px;">
+        <div style="font-size:32px;font-weight:900;color:#FBF7EE;letter-spacing:-0.02em;line-height:1;">
+          La Figurita
+        </div>
+        <div style="font-size:13px;color:rgba(251,247,238,0.5);margin-top:6px;">
+          Álbumes coleccionables personalizados
+        </div>
+        <div style="margin-top:20px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.1);">
+          <span style="font-size:22px;font-weight:900;color:#FACC15;">
+            ¡Gracias, ${name.split(' ')[0]}!
+          </span>
+        </div>
       </div>
-      <div style="font-size:13px;color:rgba(251,247,238,0.5);margin-top:6px;">
-        Álbumes coleccionables personalizados
-      </div>
-      <div style="margin-top:20px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.1);">
-        <span style="font-size:22px;font-weight:900;color:#FACC15;">
-          ¡Gracias, ${name.split(' ')[0]}!
-        </span>
-      </div>
-    </div>
 
           <p style="font-size:16px;line-height:1.6;">
             Recibimos tu pedido del <strong>Álbum La Figurita — Edición DAD</strong>.
