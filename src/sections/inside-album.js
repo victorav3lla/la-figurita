@@ -15,6 +15,7 @@ export function insideAlbum() {
       description: '32 láminas verticales y 8 horizontales distribuidas en 16 páginas. Tú nos envías las fotos, nosotros armamos el álbum.',
       color: 'cobalt',
       visual: stickersVisual()
+    },
     {
       number: '03',
       label: 'Preguntas y Trivias',
