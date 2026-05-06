@@ -94,16 +94,14 @@ export function insideAlbum() {
 function coverVisual() {
   return `
     <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-      <!-- Mini álbum -->
-      <rect x="55" y="35" width="100" height="130" rx="4"
+      <rect x="50" y="30" width="110" height="140" rx="4"
             fill="#FBF7EE" stroke="#0F0F0F" stroke-width="3"/>
       <text x="105" y="105" font-family="Montserrat, sans-serif" font-weight="900"
-            font-size="48" fill="#0F0F0F" text-anchor="middle">DAD</text>
-      <text x="105" y="135" font-family="Montserrat, sans-serif" font-weight="700"
-            font-size="11" fill="#0F0F0F" text-anchor="middle">2026 EDITION</text>
-      <!-- Estrella decorativa -->
-      <circle cx="155" cy="55" r="14" fill="#FACC15" stroke="#0F0F0F" stroke-width="2"/>
-      <text x="155" y="60" font-family="Montserrat, sans-serif" font-weight="900"
+            font-size="36" fill="#0F0F0F" text-anchor="middle">DAD</text>
+      <text x="105" y="128" font-family="Montserrat, sans-serif" font-weight="700"
+            font-size="9" fill="#0F0F0F" text-anchor="middle">2026 EDITION</text>
+      <circle cx="148" cy="52" r="14" fill="#FACC15" stroke="#0F0F0F" stroke-width="2"/>
+      <text x="148" y="57" font-family="Montserrat, sans-serif" font-weight="900"
             font-size="14" fill="#0F0F0F" text-anchor="middle">★</text>
     </svg>
   `

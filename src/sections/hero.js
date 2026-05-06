@@ -7,7 +7,7 @@ export function hero() {
       ${animatedBg()}
       <div class="bg-cream-overlay"></div>
 
-      <div class="hero-content px-6 pt-28 pb-20 md:pt-32 md:pb-28">
+      <div class="hero-content px-8 md:px-16 pt-28 pb-20 md:pt-32 md:pb-28">
 
           <!-- Layout 2 columnas -->
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">

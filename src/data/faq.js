@@ -9,11 +9,11 @@ export const faqs = [
   },
   {
     q: '¿Cuánto cuesta y cuánto es el envío?',
-    a: 'El precio de lanzamiento es $99.900 hasta el 12 de mayo (Batch 1). Después del 12 de mayo el precio sube a $129.900. El envío es $12.000 en Bogotá y $18.000 al resto del país. En el formulario ves el total antes de cerrar.',
+    a: 'El precio de lanzamiento es $99.900 hasta el 15 de mayo (Batch 1). Después del 15 de mayo el precio sube a $129.900. El envío es $12.000 en Bogotá y $18.000 al resto del país. En el formulario ves el total antes de cerrar.',
   },
   {
     q: '¿Hay descuento por pedir antes?',
-    a: 'Sí — el Batch 1 tiene precio de lanzamiento de $99.900, un ahorro de $30.000 frente al precio regular. La fecha límite para pedidos al precio de lanzamiento es el 12 de mayo.',
+    a: 'Sí — el Batch 1 tiene precio de lanzamiento de $99.900, un ahorro de $30.000 frente al precio regular. La fecha límite para pedidos al precio de lanzamiento es el 15 de mayo.',
   },
   {
     q: '¿Cuánto se demora en llegar?',
@@ -25,7 +25,7 @@ export const faqs = [
   },
   {
     q: '¿Cómo es el método de pago?',
-    a: 'Por transferencia bancaria, Nequi o Daviplata. Si eliges "pagar ahora", te enviamos los datos al confirmar el pedido. Si eliges WhatsApp, los coordinamos por chat.',
+    a: 'Por transferencia bancaria y Nequi. Si eliges "pagar ahora", te enviamos los datos al confirmar el pedido. Si eliges WhatsApp, los coordinamos por chat.',
   },
   {
     q: '¿La sección de preguntas viene impresa o se llena a mano?',
