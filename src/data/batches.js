@@ -37,6 +37,32 @@ export const BATCHES = [
     spots: 50,
     spotsLeft: 50,
     active: true
+  },
+  {
+    id: 'batchChile1',
+    number: 4,
+    label: 'Batch Chile · Precio lanzamiento',
+    deadline: '20 de mayo',
+    delivery: '13 de junio',
+    price: 25000,
+    discount: true,
+    discountLabel: 'Precio lanzamiento',
+    spots: 50,
+    spotsLeft: 50,
+    active: true
+  },
+  {
+    id: 'batchChile2',
+    number: 5,
+    label: 'Batch Chile',
+    deadline: '5 de junio',
+    delivery: '13 de junio',
+    price: 30000,
+    discount: false,
+    discountLabel: null,
+    spots: 50,
+    spotsLeft: 50,
+    active: true
   }
 ]
 

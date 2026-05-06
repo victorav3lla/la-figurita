@@ -2,12 +2,14 @@ import { getBatch } from './batches.js'
 
 export const SHIPPING = {
   bogota: 12000,
-  resto:  18000
+  resto:  18000,
+  chile:  0
 }
 
 export const SHIPPING_OPTIONS = [
   { id: 'bogota', label: 'Bogotá',         cost: SHIPPING.bogota },
-  { id: 'resto',  label: 'Resto del país', cost: SHIPPING.resto  }
+  { id: 'resto',  label: 'Resto del país', cost: SHIPPING.resto  },
+  { id: 'chile',  label: 'Chile',          cost: SHIPPING.chile  }
 ]
 
 export function formatCOP(amount) {
