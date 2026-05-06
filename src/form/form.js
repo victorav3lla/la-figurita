@@ -1,22 +1,23 @@
-import { SHIPPING_OPTIONS, formatCOP } from '../data/pricing.js'
-import { activeBatches } from '../data/batches.js'
+import { SHIPPING_OPTIONS, formatCOP } from '../data/pricing.js';
+import { activeBatches } from '../data/batches.js';
+import { formatPrice } from '../data/pricing.js'
 
 const PAYMENT_INFO = {
   nequi: {
     name: 'Nequi',
     number: '321 499 7957',
-    holder: 'Victor Avella'
+    holder: 'Victor Avella',
   },
   bancolombia: {
     name: 'Bancolombia Ahorros',
     account: '691-577765-76',
     holder: 'Victor Avella',
-    cc: '1.019.081.891'
-  }
-}
+    cc: '1.019.081.891',
+  },
+};
 
 export function orderForm() {
-  const batches = activeBatches()
+  const batches = activeBatches();
 
   return `
     <section id="pedir" class="relative py-20 md:py-28 px-6 bg-cream">
@@ -69,7 +70,9 @@ export function orderForm() {
               Fecha de producción
             </legend>
             <div class="batch-selector">
-              ${batches.map((batch, i) => `
+              ${batches
+                .map(
+                  (batch, i) => `
                 <label class="batch-option ${batch.discount ? 'batch-option-featured' : ''}">
                   <input type="radio" name="batch_id" value="${batch.id}" ${i === 0 ? 'checked' : ''} required />
                   <div class="batch-option-content">
@@ -77,7 +80,7 @@ export function orderForm() {
                       <span class="batch-option-label">${batch.label}</span>
                       ${batch.discount ? `<span class="batch-option-badge">★ Lanzamiento</span>` : ''}
                     </div>
-                    <p class="batch-option-price">${formatCOP(batch.price)} <span>por álbum</span></p>
+                    <p class="batch-option-price">${formatCOP(batch.price)} <span>${batch.currency || 'COP'} por álbum</span></p>
                     <div class="batch-option-dates">
                       <span>📷 Fotos: <strong>${batch.deadline}</strong></span>
                       <span>📦 Entrega: <strong>${batch.delivery}</strong></span>
@@ -86,7 +89,9 @@ export function orderForm() {
                   </div>
                   <span class="batch-option-check">✓</span>
                 </label>
-              `).join('')}
+              `
+                )
+                .join('')}
             </div>
             <span class="form-error" data-error-for="batch_id"></span>
           </fieldset>
@@ -101,10 +106,7 @@ export function orderForm() {
               <div class="form-field">
                 <label for="shipping_zone">Zona <span class="form-required">*</span></label>
                 <select id="shipping_zone" name="shipping_zone" required>
-                  <option value="">Selecciona...</option>
-                  ${SHIPPING_OPTIONS.map(opt => `
-                    <option value="${opt.id}">${opt.label} — ${formatCOP(opt.cost)}</option>
-                  `).join('')}
+                  <option value="">Primero elige el batch...</option>
                 </select>
                 <span class="form-error" data-error-for="shipping_zone"></span>
               </div>
@@ -303,5 +305,5 @@ export function orderForm() {
 
       </div>
     </section>
-  `
+  `;
 }

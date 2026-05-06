@@ -26,7 +26,7 @@ function batchCard(batch) {
         <p class="font-display font-black text-4xl md:text-5xl leading-none mb-1">
           ${formatCOP(batch.price)}
         </p>
-        <p class="text-sm opacity-70">por álbum</p>
+        <p class="text-sm opacity-70">${batch.currency || 'COP'} por álbum</p>
       </div>
 
       <div class="batch-card-body">

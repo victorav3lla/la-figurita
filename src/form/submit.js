@@ -1,10 +1,6 @@
 import { validateField, validateForm } from './validators.js';
-import {
-  calculateTotal,
-  formatCOP,
-  SHIPPING_OPTIONS,
-} from '../data/pricing.js';
 import { getBatch } from '../data/batches.js';
+import { calculateTotal, formatCOP, formatPrice, SHIPPING_OPTIONS } from '../data/pricing.js'
 
 // Genera número de pedido: LF-DDMMYY-XXXX
 function generateOrderId() {
@@ -48,10 +44,43 @@ function setupPriceSummary(form) {
     document.getElementById('btn-pay-now'),
     document.getElementById('btn-whatsapp'),
   ];
+  const btnPayNow = document.getElementById('btn-pay-now');
 
   function getSelectedBatch() {
     const checked = form.querySelector('input[name="batch_id"]:checked');
     return checked ? getBatch(checked.value) : null;
+  }
+
+  function updateShippingOptions() {
+    const batch = getSelectedBatch();
+    if (!batch) return;
+
+    const country = batch.country || 'CO';
+    const validOptions = SHIPPING_OPTIONS.filter((o) => o.country === country);
+
+    // Reconstruir el select según el país del batch
+    const currentValue = zoneSelect.value;
+    zoneSelect.innerHTML =
+      '<option value="">Selecciona...</option>' +
+      validOptions
+        .map(
+          (opt) =>
+            `<option value="${opt.id}">${opt.label} — ${formatCOP(opt.cost)}</option>`
+        )
+        .join('');
+
+    // Si la zona seleccionada ya no es válida, limpiarla
+    if (!validOptions.find((o) => o.id === currentValue)) {
+      zoneSelect.value = '';
+    }
+
+    // Ocultar/mostrar "Pagar ahora" según país
+    // Chile solo permite WhatsApp (no tenemos cuenta en Chile)
+    if (country === 'CL') {
+      btnPayNow.style.display = 'none';
+    } else {
+      btnPayNow.style.display = '';
+    }
   }
 
   function update() {
@@ -79,17 +108,20 @@ function setupPriceSummary(form) {
     });
 
     document.getElementById('summary-quantity').textContent = `(${quantity})`;
-    document.getElementById('summary-subtotal').textContent = formatCOP(
-      totals.subtotal
+    document.getElementById('summary-subtotal').textContent = formatPrice(
+      totals.subtotal,
+      batch.currency
     );
-    document.getElementById('summary-shipping').textContent = formatCOP(
-      totals.shipping
+    document.getElementById('summary-shipping').textContent = formatPrice(
+      totals.shipping,
+      batch.currency
     );
 
     const zoneLabel = SHIPPING_OPTIONS.find((o) => o.id === zone)?.label || '';
     document.getElementById('summary-zone').textContent = `(${zoneLabel})`;
-    document.getElementById('summary-total').textContent = formatCOP(
-      totals.total
+    document.getElementById('summary-total').textContent = formatPrice(
+      totals.total,
+      batch.currency
     );
 
     summary?.classList.add('is-ready');
@@ -98,7 +130,6 @@ function setupPriceSummary(form) {
       if (b) b.disabled = false;
     });
 
-    // Guardar totals para usar en el paso 2
     form.dataset.totals = JSON.stringify(totals);
     form.dataset.batchId = batch.id;
     form.dataset.zone = zone;
@@ -108,8 +139,14 @@ function setupPriceSummary(form) {
   quantityInput?.addEventListener('input', update);
   zoneSelect?.addEventListener('change', update);
   form.querySelectorAll('input[name="batch_id"]').forEach((r) => {
-    r.addEventListener('change', update);
+    r.addEventListener('change', () => {
+      updateShippingOptions();
+      update();
+    });
   });
+
+  // Inicializar
+  updateShippingOptions();
   update();
 }
 
