@@ -3,7 +3,7 @@ export const BATCHES = [
     id: 'batch1',
     number: 1,
     label: 'Batch 1 · Precio lanzamiento',
-    deadline: '12 de mayo',
+    deadline: '15 de mayo',
     delivery: '22 de mayo',
     price: 99900,
     discount: true,

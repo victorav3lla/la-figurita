@@ -1,4 +1,5 @@
 import './style.css'
+import { navbar, setupNavbar } from './components/navbar.js'
 import { hero } from './sections/hero.js'
 import { howItWorks } from './sections/how-it-works.js'
 import { insideAlbum } from './sections/inside-album.js'
@@ -12,6 +13,7 @@ import { setupCarousel } from './components/album-carousel.js'
 const app = document.querySelector('#app')
 
 app.innerHTML = `
+  ${navbar()}
   ${hero()}
   ${howItWorks()}
   ${insideAlbum()}
@@ -21,5 +23,6 @@ app.innerHTML = `
   ${footer()}
 `
 
+setupNavbar()
 setupForm()
 setupCarousel()

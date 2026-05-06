@@ -7,23 +7,7 @@ export function hero() {
       ${animatedBg()}
       <div class="bg-cream-overlay"></div>
 
-      <div class="hero-content px-6 pt-8 pb-20 md:pt-10 md:pb-28">
-        <div class="max-w-7xl mx-auto">
-
-          <!-- Nav -->
-          <nav class="flex items-center justify-between mb-12 md:mb-16">
-            <a href="#" class="font-display font-black text-xl tracking-tight text-ink">
-              La Figurita
-            </a>
-            <div class="hidden md:flex items-center gap-8 text-sm font-medium">
-              <a href="#como-funciona" class="hover:text-tomato transition">Cómo funciona</a>
-              <a href="#el-album" class="hover:text-tomato transition">El álbum</a>
-              <a href="#faq" class="hover:text-tomato transition">FAQ</a>
-              <a href="#pedir" class="bg-ink text-cream px-5 py-2 rounded-full hover:bg-tomato transition">
-                Pedir
-              </a>
-            </div>
-          </nav>
+      <div class="hero-content px-6 pt-28 pb-20 md:pt-32 md:pb-28">
 
           <!-- Layout 2 columnas -->
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">

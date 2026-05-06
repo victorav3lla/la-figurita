@@ -3,7 +3,7 @@ export function insideAlbum() {
     {
       number: '01',
       label: 'Portada',
-      title: 'Edición\nDAD.',
+      title: 'Edición\nDía del padre.',
       description: 'Diseño coleccionable estilo Panini, edición especial para papá. Portada única, impresa en alta calidad.',
       color: 'tomato',
       visual: coverVisual()
