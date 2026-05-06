@@ -140,26 +140,33 @@ function stickersVisual() {
 function questionsVisual() {
   return `
     <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-      <!-- Página con preguntas -->
-      <rect x="40" y="35" width="120" height="135" rx="4"
+      <rect x="35" y="25" width="130" height="155" rx="4"
             fill="#FBF7EE" stroke="#0F0F0F" stroke-width="3"/>
+
       <!-- Pregunta 1 -->
-      <text x="55" y="65" font-family="Montserrat, sans-serif" font-weight="700"
-            font-size="10" fill="#0F0F0F">¿Tu primer recuerdo?</text>
-      <line x1="55" y1="80" x2="145" y2="80" stroke="#0F0F0F" stroke-width="1" opacity="0.3"/>
-      <!-- Letra escrita simulada -->
-      <path d="M 58 78 Q 62 73, 68 76 Q 74 79, 80 75 Q 86 71, 92 76"
-            fill="none" stroke="#2563EB" stroke-width="1.8" stroke-linecap="round"/>
+      <text x="50" y="58" font-family="Inter, sans-serif" font-weight="700"
+            font-size="8.5" fill="#0F0F0F">¿Tu primer</text>
+      <text x="50" y="69" font-family="Inter, sans-serif" font-weight="700"
+            font-size="8.5" fill="#0F0F0F">recuerdo?</text>
+      <line x1="50" y1="78" x2="150" y2="78" stroke="#0F0F0F" stroke-width="0.8" opacity="0.25"/>
+      <path d="M 53 76 Q 58 71, 64 74 Q 70 77, 76 72 Q 82 68, 88 73"
+            fill="none" stroke="#2563EB" stroke-width="1.6" stroke-linecap="round"/>
+
       <!-- Pregunta 2 -->
-      <text x="55" y="105" font-family="Montserrat, sans-serif" font-weight="700"
-            font-size="10" fill="#0F0F0F">¿Tu mejor consejo?</text>
-      <line x1="55" y1="120" x2="145" y2="120" stroke="#0F0F0F" stroke-width="1" opacity="0.3"/>
-      <path d="M 58 118 Q 64 114, 70 117 Q 78 121, 86 115 Q 94 110, 102 116 Q 110 121, 118 116"
-            fill="none" stroke="#2563EB" stroke-width="1.8" stroke-linecap="round"/>
+      <text x="50" y="100" font-family="Inter, sans-serif" font-weight="700"
+            font-size="8.5" fill="#0F0F0F">¿Tu mejor</text>
+      <text x="50" y="111" font-family="Inter, sans-serif" font-weight="700"
+            font-size="8.5" fill="#0F0F0F">consejo?</text>
+      <line x1="50" y1="120" x2="150" y2="120" stroke="#0F0F0F" stroke-width="0.8" opacity="0.25"/>
+      <path d="M 53 118 Q 60 113, 67 116 Q 75 119, 83 114 Q 91 109, 99 114 Q 107 119, 115 114"
+            fill="none" stroke="#2563EB" stroke-width="1.6" stroke-linecap="round"/>
+
       <!-- Pregunta 3 -->
-      <text x="55" y="145" font-family="Montserrat, sans-serif" font-weight="700"
-            font-size="10" fill="#0F0F0F">¿Lo que más amas?</text>
-      <line x1="55" y1="160" x2="145" y2="160" stroke="#0F0F0F" stroke-width="1" opacity="0.3"/>
+      <text x="50" y="142" font-family="Inter, sans-serif" font-weight="700"
+            font-size="8.5" fill="#0F0F0F">¿Lo que más</text>
+      <text x="50" y="153" font-family="Inter, sans-serif" font-weight="700"
+            font-size="8.5" fill="#0F0F0F">amas?</text>
+      <line x1="50" y1="162" x2="150" y2="162" stroke="#0F0F0F" stroke-width="0.8" opacity="0.25"/>
     </svg>
   `
 }

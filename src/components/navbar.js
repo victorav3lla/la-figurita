@@ -11,7 +11,7 @@ export function navbar() {
       <div class="site-nav-inner">
 
         <!-- Logo -->
-        <a href="#" class="site-nav-logo">La Figurita</a>
+        <a href="#" class="site-nav-logo" aria-label="Ir al inicio">La Figurita</a>
 
         <!-- Links desktop -->
         <nav class="site-nav-links" aria-label="Navegación principal">
@@ -87,4 +87,19 @@ export function setupNavbar() {
   }, { rootMargin: '-40% 0px -55% 0px' })
 
   sections.forEach(s => observer.observe(s))
+
+  // Botón flotante "ir arriba"
+  const scrollBtn = document.createElement('button')
+  scrollBtn.className = 'scroll-top-btn'
+  scrollBtn.setAttribute('aria-label', 'Ir al inicio')
+  scrollBtn.innerHTML = '↑'
+  document.body.appendChild(scrollBtn)
+
+  window.addEventListener('scroll', () => {
+    scrollBtn.classList.toggle('is-visible', window.scrollY > 400)
+  }, { passive: true })
+
+  scrollBtn.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  })
 }
