@@ -10,7 +10,7 @@ export function howItWorks() {
     {
       number: '02',
       title: 'Nos envías tus fotos',
-      description: '40 fotos para las láminas (32 verticales y 8 horizontales) por link de Drive o WeTransfer.',
+      description: '48 fotos para las láminas (32 verticales y 16 horizontales) por link de Drive o WeTransfer.',
       color: 'cobalt',
       icon: cameraIcon()
     },

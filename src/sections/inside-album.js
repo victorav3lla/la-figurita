@@ -72,9 +72,9 @@ export function insideAlbum() {
         <div class="mt-16 md:mt-20 specs-strip">
           ${[
       { label: 'Páginas',      value: '16'    },
-      { label: 'Láminas',      value: '40'    },
+      { label: 'Láminas',      value: '48'    },
       { label: 'Verticales',   value: '32'    },
-      { label: 'Horizontales', value: '8'     },
+      { label: 'Horizontales', value: '16'     },
       { label: 'Encuadernación', value: 'Blanda' }
     ].map(s => `
             <div class="spec-item">
