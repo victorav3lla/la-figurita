@@ -1,49 +1,76 @@
 export function validateField(field) {
-  const value = field.value.trim()
-  const name = field.name
+  const value = field.value.trim();
+  const name = field.name;
 
   if (field.required && !value) {
-    return 'Este campo es obligatorio.'
+    return 'Este campo es obligatorio.';
   }
 
   switch (name) {
     case 'name':
-      if (value.length < 3) return 'Mínimo 3 caracteres.'
-      break
+      if (value.length < 3) return 'Mínimo 3 caracteres.';
+      break;
     case 'email':
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return 'Correo no válido.'
-      break
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return 'Correo no válido.';
+      break;
     case 'whatsapp':
-      if (!/^[+\d\s()-]{7,20}$/.test(value)) return 'Número no válido.'
-      break
-    case 'photos_link':
-      if (!/^https?:\/\/.+/.test(value)) return 'Debe ser un link válido (https://...).'
-      break
+      if (!/^[+\d\s()-]{7,20}$/.test(value)) return 'Número no válido.';
+      break;
+    case 'photos_link': {
+      if (!/^https?:\/\/.+/.test(value)) {
+        return 'Debe ser un link válido (https://...).';
+      }
+      // Debe tener ruta real después del dominio, no solo el dominio base
+      try {
+        const url = new URL(value);
+        const hasPath = url.pathname && url.pathname.length > 1;
+        const hasQuery = url.search.length > 0;
+        if (!hasPath && !hasQuery) {
+          return 'Pega el link completo de la carpeta compartida, no solo el sitio web.';
+        }
+        // Dominios permitidos
+        const allowed = [
+          'drive.google.com',
+          'we.tl',
+          'wetransfer.com',
+          'dropbox.com',
+          'www.dropbox.com',
+          'icloud.com',
+          'photos.app.goo.gl',
+        ];
+        if (!allowed.some((domain) => url.hostname.includes(domain))) {
+          return 'Usa Google Drive, WeTransfer, Dropbox o iCloud para compartir las fotos.';
+        }
+      } catch {
+        return 'El link no es válido.';
+      }
+      break;
+    }
     case 'quantity':
-      const n = parseInt(value, 10)
-      if (isNaN(n) || n < 1 || n > 10) return 'Entre 1 y 10.'
-      break
+      const n = parseInt(value, 10);
+      if (isNaN(n) || n < 1 || n > 10) return 'Entre 1 y 10.';
+      break;
     case 'shipping_zone':
-      if (!value) return 'Selecciona una zona.'
-      break
+      if (!value) return 'Selecciona una zona.';
+      break;
   }
 
-  return null
+  return null;
 }
 
 export function validateForm(form) {
-  const fields = form.querySelectorAll('input, textarea, select')
-  const errors = {}
-  let firstErrorField = null
+  const fields = form.querySelectorAll('input, textarea, select');
+  const errors = {};
+  let firstErrorField = null;
 
-  fields.forEach(field => {
-    if (!field.name) return
-    const error = validateField(field)
+  fields.forEach((field) => {
+    if (!field.name) return;
+    const error = validateField(field);
     if (error) {
-      errors[field.name] = error
-      if (!firstErrorField) firstErrorField = field
+      errors[field.name] = error;
+      if (!firstErrorField) firstErrorField = field;
     }
-  })
+  });
 
-  return { errors, firstErrorField, valid: Object.keys(errors).length === 0 }
+  return { errors, firstErrorField, valid: Object.keys(errors).length === 0 };
 }
