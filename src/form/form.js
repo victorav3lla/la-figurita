@@ -138,7 +138,7 @@ export function orderForm() {
                 <label for="photos_link">Link de las fotos <span class="form-required">*</span></label>
                 <input type="url" id="photos_link" name="photos_link" required
                        placeholder="https://drive.google.com/... o https://we.tl/..." />
-                <span class="form-help">Sube las 40 fotos a Google Drive o WeTransfer con acceso abierto.</span>
+                <span class="form-help">Sube 48 fotos a Google Drive o WeTransfer. 40 van en el álbum y 8 son extras para que elijas. Acceso abierto.</span>
                 <span class="form-error" data-error-for="photos_link"></span>
               </div>
               <div class="form-field form-field-full">

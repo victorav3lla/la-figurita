@@ -11,8 +11,8 @@ export function insideAlbum() {
     {
       number: '02',
       label: 'Láminas',
-      title: '40 fotos.\n40 momentos.',
-      description: '32 láminas verticales y 8 horizontales distribuidas en 16 páginas. Tú nos envías las fotos, nosotros armamos el álbum.',
+      title: '48 fotos.\n48 momentos.',
+      description: 'Imprimimos 48 láminas con tus fotos — 40 van en el álbum y 8 son tuyas para pegar donde quieras o guardar de recuerdo.',
       color: 'cobalt',
       visual: stickersVisual()
     },

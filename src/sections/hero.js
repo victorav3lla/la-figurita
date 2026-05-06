@@ -29,7 +29,7 @@ export function hero() {
 
               <p class="text-lg text-ink max-w-lg mb-8 leading-relaxed">
                 Convertimos las fotos que más quieres en un álbum de láminas
-                personalizado. <span class="font-semibold">16 páginas, 40 figuritas únicas.</span>
+                personalizado. <span class="font-semibold">16 páginas, 48 figuritas únicas para elegir.</span>
               </p>
 
               <div class="flex flex-wrap gap-3 mb-10">
@@ -49,8 +49,8 @@ export function hero() {
                   <p class="text-[10px] uppercase tracking-wider text-ink-soft mt-1.5">Páginas</p>
                 </div>
                 <div>
-                  <p class="font-display font-black text-3xl text-ink leading-none">40</p>
-                  <p class="text-[10px] uppercase tracking-wider text-ink-soft mt-1.5">Láminas</p>
+                  <p class="font-display font-black text-3xl text-ink leading-none">48</p>
+                  <p class="text-[10px] uppercase tracking-wider text-ink-soft mt-1.5">Figuritas</p>
                 </div>
                 <div>
                   <p class="font-display font-black text-3xl text-ink leading-none">1</p>

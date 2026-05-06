@@ -1,7 +1,7 @@
 export const faqs = [
   {
     q: '¿Qué resolución necesitan tener las fotos?',
-    a: 'Mínimo 1500 px del lado más largo. Si las tomas con celular reciente, en alta calidad, no tendrás problema. Evita fotos borrosas, con poca luz o capturas de pantalla.',
+    a: 'Necesitamos 48 fotos en total — 40 van en el álbum y 8 son extras para que las pegues donde quieras o las guardes. Súbelas a Google Drive o WeTransfer con acceso abierto y pega el link en el formulario.',
   },
   {
     q: '¿Cómo les envío las fotos?',
