@@ -47,8 +47,8 @@ export const BATCHES = [
     price: 25000,
     discount: true,
     discountLabel: 'Precio lanzamiento',
-    spots: 50,
-    spotsLeft: 49,
+    spots: 20,
+    spotsLeft: 19,
     active: true
   },
   {
@@ -60,8 +60,8 @@ export const BATCHES = [
     price: 30000,
     discount: false,
     discountLabel: null,
-    spots: 50,
-    spotsLeft: 50,
+    spots: 20,
+    spotsLeft: 20,
     active: true
   }
 ]
