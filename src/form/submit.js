@@ -335,7 +335,6 @@ function saveFormData(form) {
 }
 
 function showSuccess(method, orderId, data) {
-  // Ocultar formulario y paso 2
   document.getElementById('order-form').hidden = true;
   document.getElementById('payment-step').hidden = true;
 
@@ -348,9 +347,8 @@ function showSuccess(method, orderId, data) {
   if (method === 'pay_now') {
     if (text)
       text.textContent =
-        'Recibimos tu comprobante. En breve confirmamos el pago y ponemos tu álbum en producción. Te escribimos por WhatsApp.';
+        'Recibimos tu comprobante. Lo verificamos y ponemos tu álbum en producción. Te escribimos por WhatsApp para confirmarte.';
   } else {
-    // WhatsApp: mostrar botón para abrir chat
     const batch = getBatch(data.batch_id);
     const waText = encodeURIComponent(
       `Hola! Soy ${data.name} y acabo de hacer un pedido en lafigurita.com.\n` +
@@ -370,6 +368,31 @@ function showSuccess(method, orderId, data) {
         Abrir WhatsApp →
       </a>
     `;
+  }
+
+  // Botón de reset — aparece siempre en los dos casos
+  if (!document.getElementById('btn-reset')) {
+    const resetBtn = document.createElement('a');
+    resetBtn.id = 'btn-reset';
+    resetBtn.href = '#';
+    resetBtn.textContent = '← Hacer otro pedido';
+    resetBtn.style.cssText = `
+      display: inline-block;
+      margin-top: 20px;
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 15px;
+      color: var(--color-cream);
+      opacity: 0.85;
+      text-decoration: underline;
+      cursor: pointer;
+    `;
+    resetBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      setTimeout(() => location.reload(), 400);
+    });
+    success.appendChild(resetBtn);
   }
 
   if (success) {
