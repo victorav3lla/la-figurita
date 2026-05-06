@@ -1,5 +1,6 @@
 import { Resend } from 'resend'
 import { getBatch } from '../src/data/batches.js'
+import { sql } from './db.js'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
@@ -15,13 +16,32 @@ export default async function handler(req, res) {
       payment_method, batch_id, totals, proof
     } = req.body
 
-    const batch      = getBatch(batch_id)
-    const zoneLabel  = shipping_zone === 'bogota' ? 'Bogotá' : 'Resto del país'
+    const batch       = getBatch(batch_id)
+    const zoneLabel   = shipping_zone === 'bogota' ? 'Bogotá' : 'Resto del país'
     const methodLabel = payment_method === 'pay_now' ? 'Pagó ahora (comprobante adjunto)' : 'Cierra por WhatsApp'
 
     const formatCOP = (n) => new Intl.NumberFormat('es-CO', {
       style: 'currency', currency: 'COP', maximumFractionDigits: 0
     }).format(n)
+
+    // --- Guardar en base de datos ---
+    await sql`
+      INSERT INTO orders (
+        order_id, channel, status,
+        name, email, whatsapp, city, address,
+        batch_id, shipping_zone, quantity, photos_link, notes,
+        subtotal, shipping, total,
+        payment_method, has_proof
+      ) VALUES (
+        ${order_id}, 'web', ${payment_method === 'pay_now' ? 'paid_pending_review' : 'pending'},
+        ${name}, ${email}, ${whatsapp}, ${city}, ${address},
+        ${batch_id}, ${shipping_zone}, ${parseInt(quantity)}, ${photos_link}, ${notes || null},
+        ${totals.subtotal}, ${totals.shipping}, ${totals.total},
+        ${payment_method}, ${proof ? true : false}
+      )
+    `
+
+    // --- Resto del código de los correos (igual que antes) ---
 
     const emailHeader = `
       <div style="font-family:sans-serif;max-width:600px;margin:0 auto;">
@@ -71,14 +91,12 @@ export default async function handler(req, res) {
       </div>
     `
 
-    // Adjunto del comprobante (solo si pagó ahora)
     const attachments = proof ? [{
       filename: proof.name,
       content: proof.data,
       type: proof.type
     }] : []
 
-    // Correo de notificación para ti
     await resend.emails.send({
       from: 'La Figurita <hola@lafigurita.com>',
       to: [process.env.NOTIFY_EMAIL],
@@ -87,7 +105,6 @@ export default async function handler(req, res) {
       html: emailHeader + orderTable + emailFooter + '</div>'
     })
 
-    // Correo de confirmación al cliente
     const clientMessage = payment_method === 'pay_now'
       ? `Recibimos tu comprobante de pago. Lo verificamos y ponemos tu álbum en producción. Te escribimos por WhatsApp al ${whatsapp} para confirmarte.`
       : `Registramos tu pedido. Te escribiremos por WhatsApp al ${whatsapp} en menos de 24 horas para coordinar el pago.`
