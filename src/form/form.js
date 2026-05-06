@@ -63,7 +63,7 @@ export function orderForm() {
                   <div class="batch-option-content">
                     <div class="batch-option-top">
                       <span class="batch-option-label">${batch.label}</span>
-                      ${batch.discount ? `<span class="batch-option-badge">−${batch.discountPercent}%</span>` : ''}
+                      ${batch.discount ? `<span class="batch-option-badge">★ Lanzamiento</span>` : ''}
                     </div>
                     <p class="batch-option-price">${formatCOP(batch.price)} <span>por álbum</span></p>
                     <div class="batch-option-dates">

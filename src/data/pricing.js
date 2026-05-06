@@ -2,7 +2,7 @@ import { getBatch } from './batches.js'
 
 export const SHIPPING = {
   bogota: 12000,
-  resto: 18000
+  resto:  18000
 }
 
 export const SHIPPING_OPTIONS = [
@@ -24,11 +24,7 @@ export function calculateTotal({ quantity, shippingZone, batchId }) {
 
   const subtotal = batch.price * quantity
   const shipping = SHIPPING[shippingZone] ?? 0
-  const baseTotal = subtotal + shipping
-  const discount = batch.discount
-    ? Math.round(baseTotal * (batch.discountPercent / 100))
-    : 0
-  const total = baseTotal - discount
+  const total    = subtotal + shipping
 
-  return { subtotal, shipping, discount, total, pricePerUnit: batch.price }
+  return { subtotal, shipping, discount: 0, total, pricePerUnit: batch.price }
 }

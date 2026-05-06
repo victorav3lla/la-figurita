@@ -2,14 +2,14 @@ export const BATCHES = [
   {
     id: 'batch1',
     number: 1,
-    label: 'Batch 1',
+    label: 'Batch 1 · Precio lanzamiento',
     deadline: '12 de mayo',
     delivery: '22 de mayo',
-    price: 45000,
+    price: 99900,
     discount: true,
-    discountPercent: 10,
+    discountLabel: 'Precio lanzamiento',
     spots: 50,
-    spotsLeft: 50,    // actualiza esto manualmente cuando lleguen pedidos
+    spotsLeft: 50,
     active: true
   },
   {
@@ -18,9 +18,9 @@ export const BATCHES = [
     label: 'Batch 2',
     deadline: '22 de mayo',
     delivery: '5 de junio',
-    price: 50000,
+    price: 129900,
     discount: false,
-    discountPercent: 0,
+    discountLabel: null,
     spots: 50,
     spotsLeft: 50,
     active: true
@@ -31,9 +31,9 @@ export const BATCHES = [
     label: 'Batch 3',
     deadline: '5 de junio',
     delivery: '19 de junio',
-    price: 50000,
+    price: 129900,
     discount: false,
-    discountPercent: 0,
+    discountLabel: null,
     spots: 50,
     spotsLeft: 50,
     active: true

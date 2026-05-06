@@ -39,7 +39,7 @@ export function faq() {
           <p class="text-ink-soft mb-5">
             Escríbenos por WhatsApp y te respondemos rápido.
           </p>
-          <a href="https://wa.me/573019295928" target="_blank" rel="noopener" class="font-display font-bold bg-grass text-cream px-6 py-3 rounded-full hover:bg-ink transition inline-flex items-center gap-2">
+          <a href="https://wa.me/573144329060" target="_blank" rel="noopener" class="font-display font-bold bg-grass text-cream px-6 py-3 rounded-full hover:bg-ink transition inline-flex items-center gap-2">
             Escribir por WhatsApp
             <span aria-hidden="true">→</span>
           </a>

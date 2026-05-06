@@ -39,9 +39,11 @@ export function batchesSection() {
                     </span>
                     ${isFeatured ? `
                       <span class="batch-badge-discount">
-                        −${batch.discountPercent}% · Más próximo
-                      </span>
-                    ` : ''}
+                        ${batch.discount ? `
+                          <span class="batch-badge-discount">
+                            −${batch.discountPercent}% · Más próximo
+                          </span>
+                        ` : ''}
                     ${isSoldOut ? `
                       <span class="batch-badge-soldout">Agotado</span>
                     ` : ''}

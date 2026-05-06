@@ -36,7 +36,7 @@ export function footer() {
             </p>
             <ul class="space-y-2">
               <li>
-                <a href="https://wa.me/573019295928" target="_blank" rel="noopener" class="hover:text-tomato transition inline-flex items-center gap-2">
+                <a href="https://wa.me/573144329060" target="_blank" rel="noopener" class="hover:text-tomato transition inline-flex items-center gap-2">
                   WhatsApp
                   <span aria-hidden="true">↗</span>
                 </a>

@@ -133,7 +133,7 @@ export default async function handler(req, res) {
           Álbumes coleccionables personalizados · Bogotá, Colombia
         </div>
         <div style="display:flex;justify-content:center;gap:16px;margin-bottom:16px;">
-          <a href="https://wa.me/573013456789"
+          <a href="https://wa.me/573144329060"
             style="font-size:12px;color:#0F0F0F;font-weight:600;text-decoration:none;">
             WhatsApp
           </a>
@@ -225,7 +225,7 @@ export default async function handler(req, res) {
           Álbumes coleccionables personalizados · Bogotá, Colombia
         </div>
         <div style="display:flex;justify-content:center;gap:16px;margin-bottom:16px;">
-          <a href="https://wa.me/573013456789"
+          <a href="https://wa.me/573144329060"
             style="font-size:12px;color:#0F0F0F;font-weight:600;text-decoration:none;">
             WhatsApp
           </a>

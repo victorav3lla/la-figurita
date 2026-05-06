@@ -15,15 +15,14 @@ export function insideAlbum() {
       description: '32 láminas verticales y 8 horizontales distribuidas en 16 páginas. Tú nos envías las fotos, nosotros armamos el álbum.',
       color: 'cobalt',
       visual: stickersVisual()
-    },
     {
       number: '03',
-      label: 'Preguntas',
-      title: 'Espacio para\nescribir.',
-      description: 'Una sección con preguntas para que el destinatario responda con su puño y letra. Queda registrada su voz, no solo las fotos.',
+      label: 'Preguntas y Trivias',
+      title: 'Escrito\na mano.',
+      description: 'El álbum incluye una sección de preguntas sobre recuerdos futboleros y una trivia del fútbol — para que papá la responda con su puño y letra.',
       color: 'grass',
       visual: questionsVisual()
-    }
+    },
   ]
 
   return `
@@ -71,11 +70,11 @@ export function insideAlbum() {
         <!-- Specs strip -->
         <div class="mt-16 md:mt-20 specs-strip">
           ${[
-      { label: 'Páginas', value: '16' },
-      { label: 'Láminas', value: '40' },
-      { label: 'Verticales', value: '32' },
-      { label: 'Horizontales', value: '8' },
-      { label: 'Formato', value: 'A5' }
+      { label: 'Páginas',      value: '16'    },
+      { label: 'Láminas',      value: '40'    },
+      { label: 'Verticales',   value: '32'    },
+      { label: 'Horizontales', value: '8'     },
+      { label: 'Encuadernación', value: 'Blanda' }
     ].map(s => `
             <div class="spec-item">
               <p class="font-display font-black text-4xl md:text-5xl text-ink leading-none">${s.value}</p>
