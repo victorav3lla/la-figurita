@@ -9,7 +9,7 @@ export const BATCHES = [
     discount: true,
     discountLabel: 'Precio lanzamiento',
     spots: 50,
-    spotsLeft: 50,
+    spotsLeft: 46,
     active: true
   },
   {
@@ -48,7 +48,7 @@ export const BATCHES = [
     discount: true,
     discountLabel: 'Precio lanzamiento',
     spots: 50,
-    spotsLeft: 50,
+    spotsLeft: 49,
     active: true
   },
   {
