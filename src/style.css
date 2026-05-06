@@ -1335,3 +1335,125 @@ html, body {
     margin: 32px auto 0 auto;
   }
 }
+
+
+/* ---------- Paso 2: Datos de pago ---------- */
+
+.payment-methods {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+@media (max-width: 640px) {
+  .payment-methods { grid-template-columns: 1fr; }
+}
+
+.payment-method-card {
+  background: var(--color-paper);
+  border: 2px solid var(--color-ink);
+  border-radius: 16px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.payment-method-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.payment-method-icon {
+  font-size: 24px;
+}
+
+.payment-method-name {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 18px;
+}
+
+.payment-method-detail p {
+  margin: 0;
+  line-height: 1.5;
+}
+
+.copy-btn {
+  align-self: flex-start;
+  margin-top: 4px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 13px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: 2px solid var(--color-ink);
+  background: var(--color-cream);
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.copy-btn:hover {
+  background: var(--color-ink);
+  color: var(--color-cream);
+}
+
+/* Upload comprobante */
+.proof-upload-wrapper {
+  position: relative;
+}
+
+.proof-upload-wrapper input[type="file"] {
+  position: absolute;
+  opacity: 0;
+  width: 0.1px;
+  height: 0.1px;
+}
+
+.proof-upload-label {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 18px;
+  border: 2px dashed var(--color-ink);
+  border-radius: 12px;
+  background: var(--color-cream);
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.proof-upload-label:hover {
+  background: color-mix(in srgb, var(--color-sun) 20%, var(--color-cream));
+}
+
+.proof-upload-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--color-ink);
+  color: var(--color-cream);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.proof-upload-sub {
+  display: block;
+  font-size: 12px;
+  color: var(--color-ink-soft);
+  margin-top: 2px;
+}
+
+/* Orden en éxito */
+.form-success-order {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 14px;
+  opacity: 0.8;
+  margin-top: 8px;
+}
