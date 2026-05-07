@@ -398,9 +398,26 @@ function viewCreate() {
   `;
 }
 
-function orderDetailPanel(order) {
+function orderDetailPanel(order, editMode = false) {
   if (!order) return ''
   const batch = BATCHES.find(b => b.id === order.batch_id)
+
+  const viewField = (label, value) => `
+    <div class="mb-3">
+      <p class="detail-sublabel">${label}</p>
+      <p class="text-sm font-medium text-zinc-800">${value || '—'}</p>
+    </div>
+  `
+
+  const editField = (label, id, value, type = 'text') => `
+    <div class="mb-3">
+      <label class="detail-sublabel">${label}</label>
+      ${type === 'textarea'
+        ? `<textarea class="input text-sm" id="${id}" rows="2">${value || ''}</textarea>`
+        : `<input type="${type}" class="input text-sm" id="${id}" value="${value || ''}" />`
+      }
+    </div>
+  `
 
   return `
     <div class="detail-overlay" id="detail-overlay">
@@ -411,15 +428,23 @@ function orderDetailPanel(order) {
           <div>
             <p class="font-mono text-xs text-zinc-400 mb-1">${order.order_id}</p>
             <h2 class="font-display font-black text-xl">${order.name}</h2>
-            <div class="mt-1">${channelBadge(order.channel)} ${statusBadge(order.status)}</div>
+            <div class="mt-1 flex gap-2">${channelBadge(order.channel)} ${statusBadge(order.status)}</div>
           </div>
-          <button id="close-detail"
-                  class="w-8 h-8 rounded-full bg-zinc-100 hover:bg-zinc-200 flex items-center justify-center transition font-bold text-zinc-600">
-            ✕
-          </button>
+          <div class="flex gap-2">
+            ${!editMode ? `
+              <button id="toggle-edit" title="Editar"
+                      class="w-8 h-8 rounded-full bg-zinc-100 hover:bg-zinc-200 flex items-center justify-center transition text-zinc-600">
+                ✏️
+              </button>
+            ` : ''}
+            <button id="close-detail"
+                    class="w-8 h-8 rounded-full bg-zinc-100 hover:bg-zinc-200 flex items-center justify-center transition text-zinc-600 font-bold">
+              ✕
+            </button>
+          </div>
         </div>
 
-        <!-- Estado -->
+        <!-- Estado (siempre editable) -->
         <div class="detail-section">
           <p class="detail-label">Estado</p>
           <select class="detail-status-select input" data-order-id="${order.order_id}">
@@ -429,43 +454,34 @@ function orderDetailPanel(order) {
           </select>
         </div>
 
-        <!-- Datos del cliente (editables) -->
+        <!-- Datos del cliente -->
         <div class="detail-section">
-          <p class="detail-label">Datos del cliente</p>
-          <div class="flex flex-col gap-3">
-            <div>
-              <label class="detail-sublabel">Nombre</label>
-              <input type="text" class="input text-sm" id="edit-name" value="${order.name || ''}" />
-            </div>
-            <div>
-              <label class="detail-sublabel">Email</label>
-              <input type="email" class="input text-sm" id="edit-email" value="${order.email || ''}" />
-            </div>
-            <div>
-              <label class="detail-sublabel">WhatsApp</label>
-              <input type="tel" class="input text-sm" id="edit-whatsapp" value="${order.whatsapp || ''}" />
-            </div>
-            <div>
-              <label class="detail-sublabel">Ciudad</label>
-              <input type="text" class="input text-sm" id="edit-city" value="${order.city || ''}" />
-            </div>
-            <div>
-              <label class="detail-sublabel">Dirección</label>
-              <textarea class="input text-sm" id="edit-address" rows="2">${order.address || ''}</textarea>
-            </div>
-          </div>
+          <p class="detail-label">Cliente</p>
+          ${editMode ? `
+            ${editField('Nombre', 'edit-name', order.name)}
+            ${editField('Email', 'edit-email', order.email, 'email')}
+            ${editField('WhatsApp', 'edit-whatsapp', order.whatsapp, 'tel')}
+            ${editField('Ciudad', 'edit-city', order.city)}
+            ${editField('Dirección', 'edit-address', order.address, 'textarea')}
+          ` : `
+            ${viewField('Nombre', order.name)}
+            ${viewField('Email', order.email)}
+            ${viewField('WhatsApp', order.whatsapp)}
+            ${viewField('Ciudad', order.city)}
+            ${viewField('Dirección', order.address)}
+          `}
           <a href="https://wa.me/${order.whatsapp?.replace(/\D/g,'')}"
              target="_blank"
-             class="mt-3 inline-flex items-center gap-2 bg-green-500 text-white text-sm font-bold px-4 py-2 rounded-xl hover:bg-green-600 transition">
+             class="mt-1 inline-flex items-center gap-2 bg-green-500 text-white text-sm font-bold px-4 py-2 rounded-xl hover:bg-green-600 transition">
             Abrir WhatsApp →
           </a>
         </div>
 
-        <!-- Pedido (editable) -->
+        <!-- Pedido -->
         <div class="detail-section">
           <p class="detail-label">Pedido</p>
-          <div class="flex flex-col gap-3">
-            <div>
+          ${editMode ? `
+            <div class="mb-3">
               <label class="detail-sublabel">Batch</label>
               <select class="input text-sm" id="edit-batch">
                 ${BATCHES.map(b =>
@@ -473,72 +489,76 @@ function orderDetailPanel(order) {
                 ).join('')}
               </select>
             </div>
-            <div>
-              <label class="detail-sublabel">Cantidad</label>
-              <input type="number" class="input text-sm" id="edit-quantity" min="1" max="10" value="${order.quantity || 1}" />
-            </div>
-          </div>
+            ${editField('Cantidad', 'edit-quantity', order.quantity, 'number')}
+          ` : `
+            ${viewField('Batch', batch?.label || order.batch_id)}
+            ${viewField('Cantidad', order.quantity + ' álbum(es)')}
+            ${viewField('Canal', order.channel)}
+            ${viewField('Método de pago', order.payment_method)}
+          `}
         </div>
 
-        <!-- Link de fotos (editable) -->
+        <!-- Fotos -->
         <div class="detail-section">
           <p class="detail-label">Link de fotos</p>
-          <input type="url" id="edit-photos" value="${order.photos_link || ''}"
-                 placeholder="https://drive.google.com/..."
-                 class="input text-sm" />
-          ${order.photos_link ? `
-            <a href="${order.photos_link}" target="_blank"
-               class="mt-2 inline-block text-xs text-blue-600 hover:underline">Ver fotos →</a>
-          ` : ''}
+          ${editMode
+            ? editField('', 'edit-photos', order.photos_link, 'url')
+            : viewField('', order.photos_link
+                ? `<a href="${order.photos_link}" target="_blank" class="text-blue-600 hover:underline text-sm">Ver fotos →</a>`
+                : '—')
+          }
         </div>
 
-        <!-- Notas (editable) -->
+        <!-- Notas -->
         <div class="detail-section">
           <p class="detail-label">Notas</p>
-          <textarea id="edit-notes" rows="3" class="input text-sm"
-                    placeholder="Sin notas...">${order.notes || ''}</textarea>
+          ${editMode
+            ? editField('', 'edit-notes', order.notes, 'textarea')
+            : viewField('', order.notes)
+          }
         </div>
 
-        <!-- Botón guardar todo -->
-        <button id="save-all" data-order-id="${order.order_id}"
-                class="w-full bg-zinc-900 text-white font-display font-bold py-3 rounded-xl hover:bg-zinc-700 transition mb-4">
-          Guardar cambios
-        </button>
-        <p id="save-msg" class="text-center text-sm text-green-600 hidden">¡Cambios guardados!</p>
+        <!-- Botones edición -->
+        ${editMode ? `
+          <div class="flex gap-3 mb-6">
+            <button id="save-all" data-order-id="${order.order_id}"
+                    class="flex-1 bg-zinc-900 text-white font-display font-bold py-3 rounded-xl hover:bg-zinc-700 transition">
+              Guardar cambios
+            </button>
+            <button id="cancel-edit"
+                    class="flex-1 bg-zinc-100 text-zinc-700 font-display font-bold py-3 rounded-xl hover:bg-zinc-200 transition">
+              Cancelar
+            </button>
+          </div>
+          <p id="save-msg" class="text-center text-sm mb-4 hidden"></p>
+        ` : ''}
 
-        <!-- Comprobante de pago -->
+        <!-- Comprobante -->
         <div class="detail-section">
           <p class="detail-label">Comprobante de pago</p>
-
           ${order.proof_url ? `
-            <div class="mb-3">
-              <img src="${order.proof_url}" alt="Comprobante"
-                   class="w-full rounded-xl border border-zinc-200 object-cover max-h-64" />
-              <a href="${order.proof_url}" target="_blank"
-                 class="mt-2 inline-block text-xs text-blue-600 hover:underline">
-                Ver en tamaño completo →
-              </a>
-            </div>
+            <img src="${order.proof_url}" alt="Comprobante"
+                 class="w-full rounded-xl border border-zinc-200 object-cover max-h-64 mb-2" />
+            <a href="${order.proof_url}" target="_blank"
+               class="text-xs text-blue-600 hover:underline block mb-3">
+              Ver en tamaño completo →
+            </a>
           ` : `
             <div class="bg-zinc-50 rounded-xl p-4 text-center text-zinc-400 text-sm mb-3">
               Sin comprobante aún
             </div>
           `}
-
-          <div>
-            <label class="detail-sublabel">Subir comprobante</label>
-            <input type="file" id="proof-upload" accept="image/jpeg,image/png,application/pdf"
-                   class="block w-full text-sm text-zinc-500 mt-1
-                          file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0
-                          file:bg-zinc-900 file:text-white file:font-bold file:cursor-pointer
-                          hover:file:bg-zinc-700" />
-            <button id="upload-proof-btn" data-order-id="${order.order_id}"
-                    class="mt-3 w-full bg-blue-600 text-white font-bold py-2.5 rounded-xl hover:bg-blue-700 transition text-sm disabled:opacity-50"
-                    disabled>
-              Subir comprobante
-            </button>
-            <p id="proof-msg" class="text-center text-sm mt-2 hidden"></p>
-          </div>
+          <input type="file" id="proof-upload" accept="image/jpeg,image/png,application/pdf"
+                 class="block w-full text-sm text-zinc-500
+                        file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0
+                        file:bg-zinc-900 file:text-white file:font-bold file:cursor-pointer
+                        hover:file:bg-zinc-700" />
+          <button id="upload-proof-btn" data-order-id="${order.order_id}"
+                  class="mt-3 w-full bg-blue-600 text-white font-bold py-2.5 rounded-xl hover:bg-blue-700 transition text-sm disabled:opacity-50"
+                  disabled>
+            Subir comprobante
+          </button>
+          <p id="proof-msg" class="text-center text-sm mt-2 hidden"></p>
         </div>
 
         <!-- Total -->
@@ -554,6 +574,7 @@ function orderDetailPanel(order) {
         <p class="text-xs text-zinc-400 text-center mt-2">
           Pedido recibido el ${formatDate(order.created_at)}
         </p>
+
       </div>
     </div>
   `
@@ -869,6 +890,60 @@ function openDetailPanel(order) {
 
     proofBtn.disabled = false
     proofBtn.textContent = 'Subir comprobante'
+  })
+
+  // Lápiz: activar modo edición
+  document.getElementById('toggle-edit')?.addEventListener('click', () => {
+    const orderId = order.order_id
+    const current = state.orders.find(o => o.order_id === orderId)
+    closeDetailPanel()
+    openDetailPanel(current, true)  // true = editMode
+  })
+
+  // Cancelar edición: volver a modo vista
+  document.getElementById('cancel-edit')?.addEventListener('click', () => {
+    const orderId = document.getElementById('save-all')?.dataset.orderId
+    const current = state.orders.find(o => o.order_id === orderId)
+    closeDetailPanel()
+    openDetailPanel(current, false)  // false = viewMode
+  })
+
+  // Guardar cambios
+  document.getElementById('save-all')?.addEventListener('click', async () => {
+    const btn     = document.getElementById('save-all')
+    const msg     = document.getElementById('save-msg')
+    const orderId = btn.dataset.orderId
+
+    btn.disabled    = true
+    btn.textContent = 'Guardando...'
+
+    try {
+      const { order: updated } = await api('/api/admin/update-order', 'POST', {
+        order_id:    orderId,
+        name:        document.getElementById('edit-name')?.value,
+        email:       document.getElementById('edit-email')?.value,
+        whatsapp:    document.getElementById('edit-whatsapp')?.value,
+        city:        document.getElementById('edit-city')?.value,
+        address:     document.getElementById('edit-address')?.value,
+        batch_id:    document.getElementById('edit-batch')?.value,
+        quantity:    document.getElementById('edit-quantity')?.value,
+        photos_link: document.getElementById('edit-photos')?.value,
+        notes:       document.getElementById('edit-notes')?.value
+      })
+
+      updateOrderInState(updated)
+
+      // Volver a modo vista con datos actualizados
+      closeDetailPanel()
+      openDetailPanel(updated, false)
+
+    } catch {
+      msg.textContent = 'Error al guardar.'
+      msg.style.color = 'red'
+      msg.classList.remove('hidden')
+      btn.disabled    = false
+      btn.textContent = 'Guardar cambios'
+    }
   })
 }
 
