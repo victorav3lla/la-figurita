@@ -1,7 +1,8 @@
-export const BATCHES = [
+export let BATCHES = []
+
+const BATCHES_FALLBACK = [
   {
     id: 'batch1',
-    number: 1,
     label: 'Batch 1 · Precio lanzamiento',
     deadline: '12 de mayo',
     delivery: '22 de mayo',
@@ -16,7 +17,6 @@ export const BATCHES = [
   },
   {
     id: 'batch2',
-    number: 2,
     label: 'Batch 2',
     deadline: '22 de mayo',
     delivery: '5 de junio',
@@ -30,7 +30,6 @@ export const BATCHES = [
   },
   {
     id: 'batch3',
-    number: 3,
     label: 'Batch 3',
     deadline: '5 de junio',
     delivery: '19 de junio',
@@ -76,9 +75,8 @@ export function getBatch(id) {
 }
 
 export function activeBatches() {
-  return BATCHES.filter(b => b.active && b.spotsLeft > 0)
+  return BATCHES.filter(b => b.active && b.spots_left > 0)
 }
-
 
 export async function loadBatches() {
   try {
@@ -100,6 +98,7 @@ export async function loadBatches() {
     }))
     return BATCHES
   } catch {
+    BATCHES = BATCHES_FALLBACK
     return BATCHES
   }
 }
