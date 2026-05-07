@@ -17,9 +17,26 @@ export function validateField(field) {
       if (!/^[+\d\s()-]{7,20}$/.test(value)) return 'Número no válido.';
       break;
     case 'photos_link': {
-      if (!/^https?:\/\/.+/.test(value)) {
-        return 'Debe ser un link válido (https://...).';
+      if (!value) break  // opcional, puede enviarse después
+      try {
+        const url = new URL(value)
+        const hasPath = url.pathname && url.pathname.length > 1
+        const hasQuery = url.search.length > 0
+        if (!hasPath && !hasQuery) {
+          return 'Pega el link completo de la carpeta compartida, no solo el sitio web.'
+        }
+        const allowed = [
+          'drive.google.com', 'we.tl', 'wetransfer.com',
+          'dropbox.com', 'www.dropbox.com', 'icloud.com', 'photos.app.goo.gl'
+        ]
+        if (!allowed.some(domain => url.hostname.includes(domain))) {
+          return 'Usa Google Drive, WeTransfer, Dropbox o iCloud para compartir las fotos.'
+        }
+      } catch {
+        return 'El link no es válido.'
       }
+      break
+    }
       // Debe tener ruta real después del dominio, no solo el dominio base
       try {
         const url = new URL(value);
