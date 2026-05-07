@@ -536,10 +536,10 @@ function orderDetailPanel(order, editMode = false) {
         <!-- Comprobante -->
         <div class="detail-section">
           <p class="detail-label">Comprobante de pago</p>
-          ${order.proof_url ? `
-            <img src="${order.proof_url}" alt="Comprobante"
+          ${order.proof_signed_url ? `
+            <img src="${order.proof_signed_url}" alt="Comprobante"
                  class="w-full rounded-xl border border-zinc-200 object-cover max-h-64 mb-2" />
-            <a href="${order.proof_url}" target="_blank"
+            <a href="${order.proof_signed_url}" target="_blank"
                class="text-xs text-blue-600 hover:underline block mb-3">
               Ver en tamaño completo →
             </a>

@@ -15,7 +15,7 @@ export default async function handler(req, res) {
     // Subir a Vercel Blob
     const buffer = Buffer.from(data, 'base64')
     const blob   = await put(`proofs/${order_id}/${filename}`, buffer, {
-      access: 'public',
+      access: 'private',
       contentType
     })
 

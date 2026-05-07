@@ -1,14 +1,15 @@
-import { sql } from '../db.js'
+import { sql } from '../db.js';
+import { head } from '@vercel/blob';
 
 export default async function handler(req, res) {
   if (req.headers['x-admin-token'] !== process.env.ADMIN_PASSWORD) {
-    return res.status(401).json({ error: 'No autorizado' })
+    return res.status(401).json({ error: 'No autorizado' });
   }
 
   try {
     const orders = await sql`
       SELECT * FROM orders ORDER BY created_at DESC
-    `
+    `;
 
     const stats = await sql`
       SELECT
@@ -23,11 +24,25 @@ export default async function handler(req, res) {
         COUNT(*) FILTER (WHERE status = 'shipped')       AS shipped,
         COUNT(*) FILTER (WHERE status = 'delivered')     AS delivered
       FROM orders
-    `
+    `;
 
-    return res.status(200).json({ orders, stats: stats[0] })
+    // Generar URLs temporales para comprobantes privados
+    for (const order of orders) {
+      if (order.proof_url) {
+        try {
+          const { downloadUrl } = await head(order.proof_url, {
+            token: process.env.BLOB_READ_WRITE_TOKEN,
+          });
+          order.proof_signed_url = downloadUrl;
+        } catch {
+          order.proof_signed_url = null;
+        }
+      }
+    }
+
+    return res.status(200).json({ orders, stats: stats[0] });
   } catch (error) {
-    console.error(error)
-    return res.status(500).json({ error: 'Error al obtener pedidos' })
+    console.error(error);
+    return res.status(500).json({ error: 'Error al obtener pedidos' });
   }
 }
