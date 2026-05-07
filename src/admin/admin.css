@@ -1,0 +1,43 @@
+@import "tailwindcss";
+
+@theme {
+  --font-display: "Montserrat", system-ui, sans-serif;
+  --font-sans: "Inter", system-ui, sans-serif;
+}
+
+html, body {
+  font-family: var(--font-sans);
+  background: #f4f4f5;
+  color: #09090b;
+}
+
+/* Status badges */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.status-pending            { background: #fef9c3; color: #713f12; }
+.status-paid_pending_review { background: #ffedd5; color: #7c2d12; }
+.status-confirmed          { background: #dbeafe; color: #1e3a8a; }
+.status-production         { background: #ede9fe; color: #4c1d95; }
+.status-shipped            { background: #ccfbf1; color: #134e4a; }
+.status-delivered          { background: #dcfce7; color: #14532d; }
+.status-cancelled          { background: #fee2e2; color: #7f1d1d; }
+
+.channel-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.channel-web       { background: #e0e7ff; color: #3730a3; }
+.channel-whatsapp  { background: #dcfce7; color: #14532d; }
