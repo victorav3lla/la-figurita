@@ -398,6 +398,109 @@ function viewCreate() {
   `;
 }
 
+function orderDetailPanel(order) {
+  if (!order) return ''
+  const batch = BATCHES.find(b => b.id === order.batch_id)
+
+  return `
+    <div class="detail-overlay" id="detail-overlay">
+      <div class="detail-panel" id="detail-panel">
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <p class="font-mono text-xs text-zinc-400 mb-1">${order.order_id}</p>
+            <h2 class="font-display font-black text-xl">${order.name}</h2>
+          </div>
+          <button id="close-detail"
+                  class="w-8 h-8 rounded-full bg-zinc-100 hover:bg-zinc-200 flex items-center justify-center transition text-zinc-600 font-bold">
+            ✕
+          </button>
+        </div>
+
+        <!-- Estado -->
+        <div class="detail-section">
+          <p class="detail-label">Estado</p>
+          <select class="detail-status-select input" data-order-id="${order.order_id}">
+            ${Object.entries(STATUS_LABELS).map(([val, label]) =>
+              `<option value="${val}" ${order.status === val ? 'selected' : ''}>${label}</option>`
+            ).join('')}
+          </select>
+        </div>
+
+        <!-- Cliente -->
+        <div class="detail-section">
+          <p class="detail-label">Cliente</p>
+          <div class="detail-card">
+            <p><strong>Email:</strong> ${order.email || '—'}</p>
+            <p><strong>WhatsApp:</strong> ${order.whatsapp}</p>
+            <p><strong>Ciudad:</strong> ${order.city}</p>
+            <p><strong>Dirección:</strong> ${order.address}</p>
+          </div>
+          <a href="https://wa.me/${order.whatsapp?.replace(/\D/g,'')}"
+             target="_blank"
+             class="mt-2 inline-flex items-center gap-2 bg-green-500 text-white text-sm font-bold px-4 py-2 rounded-xl hover:bg-green-600 transition">
+            Abrir WhatsApp →
+          </a>
+        </div>
+
+        <!-- Pedido -->
+        <div class="detail-section">
+          <p class="detail-label">Pedido</p>
+          <div class="detail-card">
+            <p><strong>Batch:</strong> ${batch?.label || order.batch_id}</p>
+            <p><strong>Cantidad:</strong> ${order.quantity} álbum(es)</p>
+            <p><strong>Canal:</strong> ${order.channel}</p>
+            <p><strong>Método de pago:</strong> ${order.payment_method}</p>
+            <p><strong>Comprobante:</strong> ${order.has_proof ? '✅ Recibido' : '❌ Pendiente'}</p>
+          </div>
+        </div>
+
+        <!-- Fotos -->
+        <div class="detail-section">
+          <p class="detail-label">Link de fotos</p>
+          <div class="flex gap-2">
+            <input type="url" id="edit-photos" value="${order.photos_link || ''}"
+                   placeholder="https://drive.google.com/..."
+                   class="input flex-1 text-sm" />
+            <button id="save-photos" data-order-id="${order.order_id}"
+                    class="bg-zinc-900 text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-zinc-700 transition whitespace-nowrap">
+              Guardar
+            </button>
+          </div>
+          ${order.photos_link ? `
+            <a href="${order.photos_link}" target="_blank"
+               class="mt-2 inline-block text-xs text-blue-600 hover:underline">
+              Ver fotos →
+            </a>
+          ` : ''}
+        </div>
+
+        <!-- Notas -->
+        <div class="detail-section">
+          <p class="detail-label">Notas</p>
+          <textarea id="edit-notes" rows="3" class="input text-sm"
+                    placeholder="Sin notas...">${order.notes || ''}</textarea>
+          <button id="save-notes" data-order-id="${order.order_id}"
+                  class="mt-2 bg-zinc-900 text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-zinc-700 transition">
+            Guardar notas
+          </button>
+        </div>
+
+        <!-- Total -->
+        <div class="detail-section">
+          <p class="detail-label">Total</p>
+          <div class="detail-card">
+            <p><strong>Subtotal:</strong> ${formatCOP(order.subtotal)}</p>
+            <p><strong>Envío:</strong> ${formatCOP(order.shipping)}</p>
+            <p class="text-lg font-black mt-2"><strong>Total:</strong> ${formatCOP(order.total)}</p>
+          </div>
+        </div>
+
+        <p class="text-xs text-zinc-400 mt-4">Pedido recibido el ${formatDate(order.created_at)}</p>
+      </div>
+    </div>
+  `
+}
+
 // ─── Render ─────────────────────────────────────────────────────────────────
 
 function render() {
@@ -581,6 +684,101 @@ function attachEvents() {
         btn.textContent = 'Crear pedido';
       }
     });
+
+  // Abrir panel de detalles al hacer clic en una fila
+  document.querySelectorAll('tbody tr').forEach(row => {
+    row.style.cursor = 'pointer'
+    row.addEventListener('click', (e) => {
+      // No abrir si hicieron clic en el select de estado o el link de WA
+      if (e.target.closest('select') || e.target.closest('a')) return
+
+      const orderId = row.querySelector('.status-select')?.dataset.orderId
+      if (!orderId) return
+
+      const order = state.orders.find(o => o.order_id === orderId)
+      if (!order) return
+
+      openDetailPanel(order)
+    })
+  });
+}
+
+function openDetailPanel(order) {
+  // Remover panel anterior si existe
+  document.getElementById('detail-overlay')?.remove()
+
+  // Agregar panel al body
+  const div = document.createElement('div')
+  div.innerHTML = orderDetailPanel(order)
+  document.body.appendChild(div.firstElementChild)
+
+  // Cerrar al hacer clic en el overlay
+  document.getElementById('detail-overlay')?.addEventListener('click', (e) => {
+    if (e.target.id === 'detail-overlay') closeDetailPanel()
+  })
+
+  // Botón cerrar
+  document.getElementById('close-detail')?.addEventListener('click', closeDetailPanel)
+
+  // Cambiar estado desde el panel
+  document.querySelector('.detail-status-select')?.addEventListener('change', async (e) => {
+    const orderId = e.target.dataset.orderId
+    try {
+      const { order: updated } = await api('/api/admin/update-status', 'POST', {
+        order_id: orderId, status: e.target.value
+      })
+      const idx = state.orders.findIndex(o => o.order_id === orderId)
+      if (idx !== -1) state.orders[idx] = updated
+    } catch {
+      alert('Error al actualizar el estado.')
+    }
+  })
+
+  // Guardar fotos
+  document.getElementById('save-photos')?.addEventListener('click', async () => {
+    const orderId = document.getElementById('save-photos').dataset.orderId
+    const photosLink = document.getElementById('edit-photos').value
+    try {
+      const { order: updated } = await api('/api/admin/update-status', 'POST', {
+        order_id: orderId, photos_link: photosLink
+      })
+      const idx = state.orders.findIndex(o => o.order_id === orderId)
+      if (idx !== -1) state.orders[idx] = updated
+      document.getElementById('save-photos').textContent = '¡Guardado!'
+      setTimeout(() => {
+        document.getElementById('save-photos').textContent = 'Guardar'
+      }, 2000)
+    } catch {
+      alert('Error al guardar el link.')
+    }
+  })
+
+  // Guardar notas
+  document.getElementById('save-notes')?.addEventListener('click', async () => {
+    const orderId = document.getElementById('save-notes').dataset.orderId
+    const notes = document.getElementById('edit-notes').value
+    try {
+      const { order: updated } = await api('/api/admin/update-status', 'POST', {
+        order_id: orderId, notes
+      })
+      const idx = state.orders.findIndex(o => o.order_id === orderId)
+      if (idx !== -1) state.orders[idx] = updated
+      document.getElementById('save-notes').textContent = '¡Guardado!'
+      setTimeout(() => {
+        document.getElementById('save-notes').textContent = 'Guardar notas'
+      }, 2000)
+    } catch {
+      alert('Error al guardar las notas.')
+    }
+  })
+}
+
+function closeDetailPanel() {
+  const overlay = document.getElementById('detail-overlay')
+  if (overlay) {
+    overlay.style.animation = 'fadeIn 0.15s ease reverse'
+    setTimeout(() => overlay.remove(), 150)
+  }
 }
 
 // ─── Data ──────────────────────────────────────────────────────────────────
