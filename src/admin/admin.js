@@ -1,6 +1,6 @@
-import './admin.css'
-import { BATCHES } from '../data/batches.js'
-import { SHIPPING_OPTIONS } from '../data/pricing.js'
+import './admin.css';
+import { BATCHES } from '../data/batches.js';
+import { SHIPPING_OPTIONS } from '../data/pricing.js';
 
 // ─── Estado global ─────────────────────────────────────────────────────────
 
@@ -11,22 +11,25 @@ const state = {
   stats: null,
   filters: { status: 'all', batch: 'all', channel: 'all' },
   loading: false,
-  creating: false
-}
+  creating: false,
+};
 
 const STATUS_LABELS = {
-  pending:             'Pendiente',
+  pending: 'Pendiente',
   paid_pending_review: 'Comprobante recibido',
-  confirmed:           'Pago confirmado',
-  production:          'En producción',
-  shipped:             'Enviado',
-  delivered:           'Entregado',
-  cancelled:           'Cancelado'
-}
+  confirmed: 'Pago confirmado',
+  production: 'En producción',
+  shipped: 'Enviado',
+  delivered: 'Entregado',
+  cancelled: 'Cancelado',
+};
 
-const formatCOP = (n) => new Intl.NumberFormat('es-CO', {
-  style: 'currency', currency: 'COP', maximumFractionDigits: 0
-}).format(n || 0)
+const formatCOP = (n) =>
+  new Intl.NumberFormat('es-CO', {
+    style: 'currency',
+    currency: 'COP',
+    maximumFractionDigits: 0,
+  }).format(n || 0);
 
 // ─── API ───────────────────────────────────────────────────────────────────
 
@@ -40,38 +43,44 @@ async function api(path, method = 'GET', body = null) {
     },
     body: body ? JSON.stringify(body) : null
   })
-  if (!res.ok) throw new Error(`${res.status}`)
+  if (!res.ok) {
+    const err = new Error(`HTTP ${res.status}`)
+    err.response = res
+    throw err
+  }
   return res.json()
 }
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
 function generateOrderId() {
-  const now    = new Date()
-  const day    = String(now.getDate()).padStart(2, '0')
-  const month  = String(now.getMonth() + 1).padStart(2, '0')
-  const year   = String(now.getFullYear()).slice(-2)
-  const random = Math.floor(1000 + Math.random() * 9000)
-  return `LF-${day}${month}${year}-${random}`
+  const now = new Date();
+  const day = String(now.getDate()).padStart(2, '0');
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const year = String(now.getFullYear()).slice(-2);
+  const random = Math.floor(1000 + Math.random() * 9000);
+  return `LF-${day}${month}${year}-${random}`;
 }
 
 function statusBadge(status) {
-  return `<span class="status-badge status-${status}">${STATUS_LABELS[status] || status}</span>`
+  return `<span class="status-badge status-${status}">${STATUS_LABELS[status] || status}</span>`;
 }
 
 function channelBadge(channel) {
-  const label = channel === 'web' ? '🌐 Web' : '💬 WhatsApp'
-  return `<span class="channel-badge channel-${channel}">${label}</span>`
+  const label = channel === 'web' ? '🌐 Web' : '💬 WhatsApp';
+  return `<span class="channel-badge channel-${channel}">${label}</span>`;
 }
 
 function formatDate(dateStr) {
   return new Date(dateStr).toLocaleDateString('es-CO', {
-    day: '2-digit', month: 'short', year: 'numeric'
-  })
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  });
 }
 
 function getBatchLabel(id) {
-  return BATCHES.find(b => b.id === id)?.label || id
+  return BATCHES.find((b) => b.id === id)?.label || id;
 }
 
 // ─── Views ─────────────────────────────────────────────────────────────────
@@ -97,12 +106,12 @@ function viewLogin() {
         </form>
       </div>
     </div>
-  `
+  `;
 }
 
 function viewDashboard() {
-  const s = state.stats
-  const recent = state.orders.slice(0, 8)
+  const s = state.stats;
+  const recent = state.orders.slice(0, 8);
 
   return `
     <div class="p-6 max-w-7xl mx-auto">
@@ -143,12 +152,16 @@ function viewDashboard() {
 
       <!-- Status overview -->
       <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
-        ${Object.entries(STATUS_LABELS).map(([key, label]) => `
+        ${Object.entries(STATUS_LABELS)
+          .map(
+            ([key, label]) => `
           <div class="bg-white rounded-xl p-4 border border-zinc-100 flex items-center gap-3">
             ${statusBadge(key)}
             <span class="font-bold text-lg">${s?.[key] || 0}</span>
           </div>
-        `).join('')}
+        `
+          )
+          .join('')}
       </div>
 
       <!-- Recent orders -->
@@ -162,12 +175,12 @@ function viewDashboard() {
         </div>
       </div>
     </div>
-  `
+  `;
 }
 
 function ordersTable(orders) {
   if (!orders.length) {
-    return `<p class="text-center py-12 text-zinc-400">No hay pedidos aún.</p>`
+    return `<p class="text-center py-12 text-zinc-400">No hay pedidos aún.</p>`;
   }
 
   return `
@@ -186,7 +199,9 @@ function ordersTable(orders) {
         </tr>
       </thead>
       <tbody>
-        ${orders.map(o => `
+        ${orders
+          .map(
+            (o) => `
           <tr class="border-b border-zinc-50 hover:bg-zinc-50 transition">
             <td class="px-4 py-3 font-mono text-xs font-semibold text-zinc-600">${o.order_id}</td>
             <td class="px-4 py-3">
@@ -200,9 +215,12 @@ function ordersTable(orders) {
             <td class="px-4 py-3">
               <select class="status-select text-xs border border-zinc-200 rounded-lg px-2 py-1 bg-white cursor-pointer"
                       data-order-id="${o.order_id}" data-current="${o.status}">
-                ${Object.entries(STATUS_LABELS).map(([val, label]) =>
-                  `<option value="${val}" ${o.status === val ? 'selected' : ''}>${label}</option>`
-                ).join('')}
+                ${Object.entries(STATUS_LABELS)
+                  .map(
+                    ([val, label]) =>
+                      `<option value="${val}" ${o.status === val ? 'selected' : ''}>${label}</option>`
+                  )
+                  .join('')}
               </select>
             </td>
             <td class="px-4 py-3 text-xs text-zinc-400">${formatDate(o.created_at)}</td>
@@ -213,21 +231,26 @@ function ordersTable(orders) {
               </a>
             </td>
           </tr>
-        `).join('')}
+        `
+          )
+          .join('')}
       </tbody>
     </table>
-  `
+  `;
 }
 
 function viewOrders() {
-  const filtered = state.orders.filter(o => {
-    if (state.filters.status  !== 'all' && o.status  !== state.filters.status)  return false
-    if (state.filters.batch   !== 'all' && o.batch_id !== state.filters.batch)  return false
-    if (state.filters.channel !== 'all' && o.channel  !== state.filters.channel) return false
-    return true
-  })
+  const filtered = state.orders.filter((o) => {
+    if (state.filters.status !== 'all' && o.status !== state.filters.status)
+      return false;
+    if (state.filters.batch !== 'all' && o.batch_id !== state.filters.batch)
+      return false;
+    if (state.filters.channel !== 'all' && o.channel !== state.filters.channel)
+      return false;
+    return true;
+  });
 
-  const totalFiltered = filtered.reduce((sum, o) => sum + (o.total || 0), 0)
+  const totalFiltered = filtered.reduce((sum, o) => sum + (o.total || 0), 0);
 
   return `
     <div class="p-6 max-w-7xl mx-auto">
@@ -247,24 +270,27 @@ function viewOrders() {
           <label class="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">Estado</label>
           <select id="filter-status" class="border border-zinc-200 rounded-lg px-3 py-2 text-sm bg-white">
             <option value="all">Todos</option>
-            ${Object.entries(STATUS_LABELS).map(([val, label]) =>
-              `<option value="${val}" ${state.filters.status === val ? 'selected' : ''}>${label}</option>`
-            ).join('')}
+            ${Object.entries(STATUS_LABELS)
+              .map(
+                ([val, label]) =>
+                  `<option value="${val}" ${state.filters.status === val ? 'selected' : ''}>${label}</option>`
+              )
+              .join('')}
           </select>
         </div>
         <div>
           <label class="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">Batch</label>
           <select id="filter-batch" class="border border-zinc-200 rounded-lg px-3 py-2 text-sm bg-white">
             <option value="all">Todos</option>
-            ${BATCHES.map(b => `<option value="${b.id}" ${state.filters.batch === b.id ? 'selected' : ''}>${b.label}</option>`).join('')}
+            ${BATCHES.map((b) => `<option value="${b.id}" ${state.filters.batch === b.id ? 'selected' : ''}>${b.label}</option>`).join('')}
           </select>
         </div>
         <div>
           <label class="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">Canal</label>
           <select id="filter-channel" class="border border-zinc-200 rounded-lg px-3 py-2 text-sm bg-white">
             <option value="all">Todos</option>
-            <option value="web"       ${state.filters.channel === 'web'       ? 'selected' : ''}>Web</option>
-            <option value="whatsapp"  ${state.filters.channel === 'whatsapp'  ? 'selected' : ''}>WhatsApp</option>
+            <option value="web"       ${state.filters.channel === 'web' ? 'selected' : ''}>Web</option>
+            <option value="whatsapp"  ${state.filters.channel === 'whatsapp' ? 'selected' : ''}>WhatsApp</option>
           </select>
         </div>
         <div class="ml-auto text-right">
@@ -280,11 +306,11 @@ function viewOrders() {
         </div>
       </div>
     </div>
-  `
+  `;
 }
 
 function viewCreate() {
-  const allBatches = BATCHES.filter(b => b.active)
+  const allBatches = BATCHES.filter((b) => b.active);
 
   return `
     <div class="p-6 max-w-2xl mx-auto">
@@ -323,14 +349,14 @@ function viewCreate() {
             <label class="label">Batch *</label>
             <select name="batch_id" required id="create-batch" class="input">
               <option value="">Selecciona...</option>
-              ${allBatches.map(b => `<option value="${b.id}">${b.label}</option>`).join('')}
+              ${allBatches.map((b) => `<option value="${b.id}">${b.label}</option>`).join('')}
             </select>
           </div>
           <div>
             <label class="label">Zona de envío *</label>
             <select name="shipping_zone" required id="create-zone" class="input">
               <option value="">Selecciona...</option>
-              ${SHIPPING_OPTIONS.map(o => `<option value="${o.id}">${o.label}</option>`).join('')}
+              ${SHIPPING_OPTIONS.map((o) => `<option value="${o.id}">${o.label}</option>`).join('')}
             </select>
           </div>
           <div>
@@ -369,18 +395,18 @@ function viewCreate() {
         </button>
       </form>
     </div>
-  `
+  `;
 }
 
 // ─── Render ─────────────────────────────────────────────────────────────────
 
 function render() {
-  const app = document.getElementById('admin-app')
+  const app = document.getElementById('admin-app');
 
   if (!state.authenticated) {
-    app.innerHTML = viewLogin()
-    attachLogin()
-    return
+    app.innerHTML = viewLogin();
+    attachLogin();
+    return;
   }
 
   if (state.loading) {
@@ -388,195 +414,214 @@ function render() {
       <div class="min-h-screen flex items-center justify-center">
         <p class="text-zinc-400 animate-pulse">Cargando...</p>
       </div>
-    `
-    return
+    `;
+    return;
   }
 
   switch (state.view) {
-    case 'dashboard': app.innerHTML = viewDashboard(); break
-    case 'orders':    app.innerHTML = viewOrders();    break
-    case 'create':    app.innerHTML = viewCreate();    break
+    case 'dashboard':
+      app.innerHTML = viewDashboard();
+      break;
+    case 'orders':
+      app.innerHTML = viewOrders();
+      break;
+    case 'create':
+      app.innerHTML = viewCreate();
+      break;
   }
 
-  attachEvents()
+  attachEvents();
 }
 
 // ─── Event listeners ────────────────────────────────────────────────────────
 
 function attachLogin() {
-  document.getElementById('login-form')?.addEventListener('submit', async e => {
-    e.preventDefault()
-    const password = document.getElementById('login-password').value
-    const errEl    = document.getElementById('login-error')
-    errEl.classList.add('hidden')
+  document
+    .getElementById('login-form')
+    ?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const password = document.getElementById('login-password').value;
+      const errEl = document.getElementById('login-error');
+      errEl.classList.add('hidden');
 
-    try {
-      const { token } = await api('/api/admin/auth', 'POST', { password })
-      sessionStorage.setItem('admin_token', token)
-      state.authenticated = true
-      await loadData()
-    } catch {
-      errEl.classList.remove('hidden')
-    }
-  })
+      try {
+        const { token } = await api('/api/admin/auth', 'POST', { password });
+        sessionStorage.setItem('admin_token', token);
+        state.authenticated = true;
+        await loadData();
+      } catch {
+        errEl.classList.remove('hidden');
+      }
+    });
 }
 
 function attachEvents() {
   // Navegación
-  document.querySelectorAll('[data-view]').forEach(btn => {
+  document.querySelectorAll('[data-view]').forEach((btn) => {
     btn.addEventListener('click', () => {
-      state.view = btn.dataset.view
-      render()
-    })
-  })
+      state.view = btn.dataset.view;
+      render();
+    });
+  });
 
   // Cambiar estado de un pedido
-  document.querySelectorAll('.status-select').forEach(sel => {
+  document.querySelectorAll('.status-select').forEach((sel) => {
     sel.addEventListener('change', async () => {
-      const orderId = sel.dataset.orderId
-      const status  = sel.value
+      const orderId = sel.dataset.orderId;
+      const status = sel.value;
       try {
-        await api('/api/admin/update-status', 'POST', { order_id: orderId, status })
-        const order = state.orders.find(o => o.order_id === orderId)
-        if (order) order.status = status
+        await api('/api/admin/update-status', 'POST', {
+          order_id: orderId,
+          status,
+        });
+        const order = state.orders.find((o) => o.order_id === orderId);
+        if (order) order.status = status;
         // Actualizar stats
-        await loadData()
+        await loadData();
       } catch {
-        sel.value = sel.dataset.current
-        alert('Error al actualizar el estado.')
+        sel.value = sel.dataset.current;
+        alert('Error al actualizar el estado.');
       }
-    })
-  })
+    });
+  });
 
   // Filtros
-  document.getElementById('filter-status')?.addEventListener('change', e => {
-    state.filters.status = e.target.value
-    render()
-  })
-  document.getElementById('filter-batch')?.addEventListener('change', e => {
-    state.filters.batch = e.target.value
-    render()
-  })
-  document.getElementById('filter-channel')?.addEventListener('change', e => {
-    state.filters.channel = e.target.value
-    render()
-  })
+  document.getElementById('filter-status')?.addEventListener('change', (e) => {
+    state.filters.status = e.target.value;
+    render();
+  });
+  document.getElementById('filter-batch')?.addEventListener('change', (e) => {
+    state.filters.batch = e.target.value;
+    render();
+  });
+  document.getElementById('filter-channel')?.addEventListener('change', (e) => {
+    state.filters.channel = e.target.value;
+    render();
+  });
 
   // Resumen de precio al crear
-  const batchSel = document.getElementById('create-batch')
-  const zoneSel  = document.getElementById('create-zone')
-  const qtySel   = document.getElementById('create-qty')
+  const batchSel = document.getElementById('create-batch');
+  const zoneSel = document.getElementById('create-zone');
+  const qtySel = document.getElementById('create-qty');
 
   function updateCreateSummary() {
-    const batch   = BATCHES.find(b => b.id === batchSel?.value)
-    const zone    = SHIPPING_OPTIONS.find(o => o.id === zoneSel?.value)
-    const qty     = parseInt(qtySel?.value) || 0
+    const batch = BATCHES.find((b) => b.id === batchSel?.value);
+    const zone = SHIPPING_OPTIONS.find((o) => o.id === zoneSel?.value);
+    const qty = parseInt(qtySel?.value) || 0;
 
     if (!batch || !zone || !qty) {
-      document.getElementById('create-summary')?.classList.add('hidden')
-      return
+      document.getElementById('create-summary')?.classList.add('hidden');
+      return;
     }
 
-    const subtotal = batch.price * qty
-    const shipping = zone.cost
-    const total    = subtotal + shipping
+    const subtotal = batch.price * qty;
+    const shipping = zone.cost;
+    const total = subtotal + shipping;
 
-    document.getElementById('cs-subtotal').textContent = formatCOP(subtotal)
-    document.getElementById('cs-shipping').textContent = formatCOP(shipping)
-    document.getElementById('cs-total').textContent    = formatCOP(total)
-    document.getElementById('create-summary')?.classList.remove('hidden')
+    document.getElementById('cs-subtotal').textContent = formatCOP(subtotal);
+    document.getElementById('cs-shipping').textContent = formatCOP(shipping);
+    document.getElementById('cs-total').textContent = formatCOP(total);
+    document.getElementById('create-summary')?.classList.remove('hidden');
 
     // Guardar para el submit
-    document.getElementById('create-form').dataset.subtotal = subtotal
-    document.getElementById('create-form').dataset.shipping = shipping
-    document.getElementById('create-form').dataset.total    = total
+    document.getElementById('create-form').dataset.subtotal = subtotal;
+    document.getElementById('create-form').dataset.shipping = shipping;
+    document.getElementById('create-form').dataset.total = total;
   }
 
-  batchSel?.addEventListener('change', updateCreateSummary)
-  zoneSel?.addEventListener('change', updateCreateSummary)
-  qtySel?.addEventListener('input', updateCreateSummary)
+  batchSel?.addEventListener('change', updateCreateSummary);
+  zoneSel?.addEventListener('change', updateCreateSummary);
+  qtySel?.addEventListener('input', updateCreateSummary);
 
   // Submit crear pedido
-  document.getElementById('create-form')?.addEventListener('submit', async e => {
-    e.preventDefault()
-    const form    = e.target
-    const errEl   = document.getElementById('create-error')
-    const btn     = document.getElementById('create-submit')
-    errEl.classList.add('hidden')
-    btn.disabled = true
-    btn.textContent = 'Creando...'
+  document
+    .getElementById('create-form')
+    ?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const form = e.target;
+      const errEl = document.getElementById('create-error');
+      const btn = document.getElementById('create-submit');
+      errEl.classList.add('hidden');
+      btn.disabled = true;
+      btn.textContent = 'Creando...';
 
-    const data = Object.fromEntries(new FormData(form))
+      const data = Object.fromEntries(new FormData(form));
 
-    if (!form.dataset.total) {
-      errEl.textContent = 'Completa batch, zona y cantidad para calcular el total.'
-      errEl.classList.remove('hidden')
-      btn.disabled = false
-      btn.textContent = 'Crear pedido'
-      return
-    }
+      if (!form.dataset.total) {
+        errEl.textContent =
+          'Completa batch, zona y cantidad para calcular el total.';
+        errEl.classList.remove('hidden');
+        btn.disabled = false;
+        btn.textContent = 'Crear pedido';
+        return;
+      }
 
-    try {
-      const order_id = generateOrderId()
-      await api('/api/admin/create-order', 'POST', {
-        ...data,
-        order_id,
-        subtotal: form.dataset.subtotal,
-        shipping: form.dataset.shipping,
-        total:    form.dataset.total
-      })
+      try {
+        const order_id = generateOrderId();
+        await api('/api/admin/create-order', 'POST', {
+          ...data,
+          order_id,
+          subtotal: form.dataset.subtotal,
+          shipping: form.dataset.shipping,
+          total: form.dataset.total,
+        });
 
-      await loadData()
-      state.view = 'orders'
-      render()
-    } catch (err) {
-      errEl.textContent = 'Error al crear el pedido. Intenta de nuevo.'
-      errEl.classList.remove('hidden')
-      btn.disabled = false
-      btn.textContent = 'Crear pedido'
-    }
-  })
+        await loadData();
+        state.view = 'orders';
+        render();
+      } catch (err) {
+        let msg = 'Error al crear el pedido.';
+        try {
+          const data = await err?.response?.json();
+          if (data?.error) msg += ` ${data.error}`;
+        } catch {}
+        errEl.textContent = msg + ` (${err.message})`;
+        errEl.classList.remove('hidden');
+        btn.disabled = false;
+        btn.textContent = 'Crear pedido';
+      }
+    });
 }
 
 // ─── Data ──────────────────────────────────────────────────────────────────
 
 async function loadData() {
-  state.loading = true
-  render()
+  state.loading = true;
+  render();
 
   try {
-    const { orders, stats } = await api('/api/admin/orders')
-    state.orders = orders
-    state.stats  = stats
+    const { orders, stats } = await api('/api/admin/orders');
+    state.orders = orders;
+    state.stats = stats;
   } catch {
-    alert('Error al cargar los datos. Verifica tu conexión.')
+    alert('Error al cargar los datos. Verifica tu conexión.');
   }
 
-  state.loading = false
-  render()
+  state.loading = false;
+  render();
 }
 
 // ─── Estilos de formulario inline ──────────────────────────────────────────
 
-const style = document.createElement('style')
+const style = document.createElement('style');
 style.textContent = `
   .label { display: block; font-size: 13px; font-weight: 600; color: #52525b; margin-bottom: 4px; }
   .input { width: 100%; border: 2px solid #e4e4e7; border-radius: 10px; padding: 10px 14px;
            font-size: 14px; background: white; transition: border-color 0.2s; font-family: inherit; }
   .input:focus { outline: none; border-color: #18181b; }
-`
-document.head.appendChild(style)
+`;
+document.head.appendChild(style);
 
 // ─── Init ──────────────────────────────────────────────────────────────────
 
 function init() {
-  const token = sessionStorage.getItem('admin_token')
+  const token = sessionStorage.getItem('admin_token');
   if (token) {
-    state.authenticated = true
-    loadData()
+    state.authenticated = true;
+    loadData();
   } else {
-    render()
+    render();
   }
 }
 
-init()
+init();
