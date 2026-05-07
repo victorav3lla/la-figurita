@@ -539,11 +539,8 @@ function orderDetailPanel(order, editMode = false) {
           ${order.proof_signed_url ? `
             <img src="${order.proof_signed_url}" alt="Comprobante"
                 class="w-full rounded-xl border border-zinc-200 object-cover max-h-64 mb-2 cursor-zoom-in" />
-            <button onclick="
-              const w = window.open('', '_blank');
-              w.document.write('<html><body style=margin:0;background:#000;display:flex;align-items:center;justify-content:center;min-height:100vh><img src=${JSON.stringify(order.proof_signed_url)} style=max-width:100%;max-height:100vh;object-fit:contain></body></html>');
-              w.document.close();
-            " class="text-xs text-blue-600 hover:underline block mb-3 text-left">
+            <button class="proof-fullscreen text-xs text-blue-600 hover:underline block mb-3 text-left"
+              data-url="${order.proof_signed_url}">
               Ver en tamaño completo →
             </button>
           ` : `
@@ -581,6 +578,13 @@ function orderDetailPanel(order, editMode = false) {
       </div>
     </div>
   `
+
+  document.querySelector('.proof-fullscreen')?.addEventListener('click', e => {
+  const url = e.target.dataset.url
+  const w = window.open('', '_blank')
+  w.document.write(`<html><body style="margin:0;background:#000;display:flex;align-items:center;justify-content:center;min-height:100vh"><img src="${url}" style="max-width:100%;max-height:100vh;object-fit:contain"></body></html>`)
+  w.document.close()
+})
 }
 
 // ─── Render ─────────────────────────────────────────────────────────────────
