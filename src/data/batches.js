@@ -79,7 +79,6 @@ export function activeBatches() {
   return BATCHES.filter(b => b.active && b.spotsLeft > 0)
 }
 
-export let BATCHES = []
 
 export async function loadBatches() {
   try {
