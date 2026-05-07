@@ -6,7 +6,7 @@ export default async function handler(req, res) {
   }
 
   if (req.method === 'GET') {
-    const batches = await sql`SELECT * FROM batches ORDER BY id ASC`
+    const batches = await sql`SELECT * FROM batches ORDER BY sort_order ASC`
     return res.status(200).json({ batches })
   }
 

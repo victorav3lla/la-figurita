@@ -5,7 +5,7 @@ export default async function handler(req, res) {
     const batches = await sql`
       SELECT * FROM batches
       WHERE active = TRUE
-      ORDER BY id ASC
+      ORDER BY sort_order ASC
     `
     return res.status(200).json({ batches })
   } catch (error) {
