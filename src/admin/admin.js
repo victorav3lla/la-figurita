@@ -782,18 +782,34 @@ function attachEvents() {
   });
 }
 
-function openDetailPanel(order) {
+function openDetailPanel(order, editMode = false) {
   document.getElementById('detail-overlay')?.remove()
 
   const div = document.createElement('div')
-  div.innerHTML = orderDetailPanel(order)
+  div.innerHTML = orderDetailPanel(order, editMode)
   document.body.appendChild(div.firstElementChild)
 
-  // Cerrar
+  // Cerrar al hacer clic en el overlay
   document.getElementById('detail-overlay')?.addEventListener('click', e => {
     if (e.target.id === 'detail-overlay') closeDetailPanel()
   })
+
+  // Botón cerrar (✕)
   document.getElementById('close-detail')?.addEventListener('click', closeDetailPanel)
+
+  // Lápiz: activar modo edición
+  document.getElementById('toggle-edit')?.addEventListener('click', () => {
+    const current = state.orders.find(o => o.order_id === order.order_id)
+    closeDetailPanel()
+    openDetailPanel(current, true)
+  })
+
+  // Cancelar: volver a modo vista
+  document.getElementById('cancel-edit')?.addEventListener('click', () => {
+    const current = state.orders.find(o => o.order_id === order.order_id)
+    closeDetailPanel()
+    openDetailPanel(current, false)
+  })
 
   // Cambiar estado
   document.querySelector('.detail-status-select')?.addEventListener('change', async e => {
@@ -804,108 +820,6 @@ function openDetailPanel(order) {
       })
       updateOrderInState(updated)
     } catch { alert('Error al actualizar el estado.') }
-  })
-
-  // Guardar todos los campos
-  document.getElementById('save-all')?.addEventListener('click', async () => {
-    const btn    = document.getElementById('save-all')
-    const msg    = document.getElementById('save-msg')
-    const orderId = btn.dataset.orderId
-
-    btn.disabled = true
-    btn.textContent = 'Guardando...'
-    msg.classList.add('hidden')
-
-    try {
-      const { order: updated } = await api('/api/admin/update-order', 'POST', {
-        order_id:   orderId,
-        name:       document.getElementById('edit-name').value,
-        email:      document.getElementById('edit-email').value,
-        whatsapp:   document.getElementById('edit-whatsapp').value,
-        city:       document.getElementById('edit-city').value,
-        address:    document.getElementById('edit-address').value,
-        batch_id:   document.getElementById('edit-batch').value,
-        quantity:   document.getElementById('edit-quantity').value,
-        photos_link: document.getElementById('edit-photos').value,
-        notes:      document.getElementById('edit-notes').value
-      })
-
-      updateOrderInState(updated)
-      msg.textContent = '¡Cambios guardados!'
-      msg.classList.remove('hidden')
-    } catch {
-      msg.textContent = 'Error al guardar.'
-      msg.classList.remove('hidden')
-      msg.style.color = 'red'
-    }
-
-    btn.disabled = false
-    btn.textContent = 'Guardar cambios'
-  })
-
-  // Habilitar botón de subir comprobante al seleccionar archivo
-  const proofInput = document.getElementById('proof-upload')
-  const proofBtn   = document.getElementById('upload-proof-btn')
-
-  proofInput?.addEventListener('change', () => {
-    proofBtn.disabled = !proofInput.files.length
-  })
-
-  // Subir comprobante
-  proofBtn?.addEventListener('click', async () => {
-    const file    = proofInput.files[0]
-    const orderId = proofBtn.dataset.orderId
-    const msgEl   = document.getElementById('proof-msg')
-
-    if (!file) return
-
-    proofBtn.disabled = true
-    proofBtn.textContent = 'Subiendo...'
-    msgEl.classList.add('hidden')
-
-    try {
-      const base64 = await fileToBase64(file)
-      const { order: updated } = await api('/api/admin/upload-proof', 'POST', {
-        order_id:    orderId,
-        filename:    file.name,
-        contentType: file.type,
-        data:        base64
-      })
-
-      updateOrderInState(updated)
-      msgEl.textContent = '¡Comprobante subido!'
-      msgEl.style.color = 'green'
-      msgEl.classList.remove('hidden')
-
-      // Reabrir el panel con datos actualizados
-      setTimeout(() => {
-        closeDetailPanel()
-        openDetailPanel(updated)
-      }, 800)
-    } catch {
-      msgEl.textContent = 'Error al subir el archivo.'
-      msgEl.style.color = 'red'
-      msgEl.classList.remove('hidden')
-    }
-
-    proofBtn.disabled = false
-    proofBtn.textContent = 'Subir comprobante'
-  })
-
-  // Lápiz: activar modo edición
-  document.getElementById('toggle-edit')?.addEventListener('click', () => {
-    const orderId = order.order_id
-    const current = state.orders.find(o => o.order_id === orderId)
-    closeDetailPanel()
-    openDetailPanel(current, true)  // true = editMode
-  })
-
-  // Cancelar edición: volver a modo vista
-  document.getElementById('cancel-edit')?.addEventListener('click', () => {
-    const orderId = document.getElementById('save-all')?.dataset.orderId
-    const current = state.orders.find(o => o.order_id === orderId)
-    closeDetailPanel()
-    openDetailPanel(current, false)  // false = viewMode
   })
 
   // Guardar cambios
@@ -932,17 +846,60 @@ function openDetailPanel(order) {
       })
 
       updateOrderInState(updated)
-
-      // Volver a modo vista con datos actualizados
       closeDetailPanel()
       openDetailPanel(updated, false)
-
     } catch {
       msg.textContent = 'Error al guardar.'
       msg.style.color = 'red'
       msg.classList.remove('hidden')
       btn.disabled    = false
       btn.textContent = 'Guardar cambios'
+    }
+  })
+
+  // Habilitar botón de subir comprobante
+  const proofInput = document.getElementById('proof-upload')
+  const proofBtn   = document.getElementById('upload-proof-btn')
+
+  proofInput?.addEventListener('change', () => {
+    proofBtn.disabled = !proofInput.files.length
+  })
+
+  // Subir comprobante
+  proofBtn?.addEventListener('click', async () => {
+    const file    = proofInput.files[0]
+    const orderId = proofBtn.dataset.orderId
+    const msgEl   = document.getElementById('proof-msg')
+
+    if (!file) return
+
+    proofBtn.disabled    = true
+    proofBtn.textContent = 'Subiendo...'
+
+    try {
+      const base64 = await fileToBase64(file)
+      const { order: updated } = await api('/api/admin/upload-proof', 'POST', {
+        order_id:    orderId,
+        filename:    file.name,
+        contentType: file.type,
+        data:        base64
+      })
+
+      updateOrderInState(updated)
+      msgEl.textContent = '¡Comprobante subido!'
+      msgEl.style.color = 'green'
+      msgEl.classList.remove('hidden')
+
+      setTimeout(() => {
+        closeDetailPanel()
+        openDetailPanel(updated, false)
+      }, 800)
+    } catch {
+      msgEl.textContent = 'Error al subir el archivo.'
+      msgEl.style.color = 'red'
+      msgEl.classList.remove('hidden')
+      proofBtn.disabled    = false
+      proofBtn.textContent = 'Subir comprobante'
     }
   })
 }
