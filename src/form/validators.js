@@ -37,32 +37,6 @@ export function validateField(field) {
       }
       break
     }
-      // Debe tener ruta real después del dominio, no solo el dominio base
-      try {
-        const url = new URL(value);
-        const hasPath = url.pathname && url.pathname.length > 1;
-        const hasQuery = url.search.length > 0;
-        if (!hasPath && !hasQuery) {
-          return 'Pega el link completo de la carpeta compartida, no solo el sitio web.';
-        }
-        // Dominios permitidos
-        const allowed = [
-          'drive.google.com',
-          'we.tl',
-          'wetransfer.com',
-          'dropbox.com',
-          'www.dropbox.com',
-          'icloud.com',
-          'photos.app.goo.gl',
-        ];
-        if (!allowed.some((domain) => url.hostname.includes(domain))) {
-          return 'Usa Google Drive, WeTransfer, Dropbox o iCloud para compartir las fotos.';
-        }
-      } catch {
-        return 'El link no es válido.';
-      }
-      break;
-    }
     case 'quantity':
       const n = parseInt(value, 10);
       if (isNaN(n) || n < 1 || n > 10) return 'Entre 1 y 10.';
