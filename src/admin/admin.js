@@ -1035,19 +1035,41 @@ function closeDetailPanel() {
 // ─── Data ──────────────────────────────────────────────────────────────────
 
 async function loadData() {
-  state.loading = true;
-  render();
+  state.loading = true
+  render()
 
   try {
-    const { orders, stats } = await api('/api/admin/orders');
-    state.orders = orders;
-    state.stats = stats;
+    const [ordersRes, batchesRes] = await Promise.all([
+      api('/api/admin/orders'),
+      api('/api/admin/batches')
+    ])
+
+    state.orders = ordersRes.orders
+    state.stats  = ordersRes.stats
+
+    // Poblar BATCHES para que viewCreate los tenga disponibles
+    BATCHES.length = 0
+    batchesRes.batches.forEach(b => BATCHES.push({
+      id:            b.id,
+      label:         b.label,
+      deadline:      b.deadline,
+      delivery:      b.delivery,
+      price:         b.price,
+      currency:      b.currency,
+      country:       b.country,
+      discount:      b.discount,
+      discountLabel: b.discount_label,
+      spots:         b.spots,
+      spotsLeft:     b.spots_left,
+      active:        b.active
+    }))
+
   } catch {
-    alert('Error al cargar los datos. Verifica tu conexión.');
+    alert('Error al cargar los datos.')
   }
 
-  state.loading = false;
-  render();
+  state.loading = false
+  render()
 }
 
 // ─── Estilos de formulario inline ──────────────────────────────────────────
