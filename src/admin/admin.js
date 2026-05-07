@@ -405,13 +405,16 @@ function orderDetailPanel(order) {
   return `
     <div class="detail-overlay" id="detail-overlay">
       <div class="detail-panel" id="detail-panel">
+
+        <!-- Header -->
         <div class="flex items-center justify-between mb-6">
           <div>
             <p class="font-mono text-xs text-zinc-400 mb-1">${order.order_id}</p>
             <h2 class="font-display font-black text-xl">${order.name}</h2>
+            <div class="mt-1">${channelBadge(order.channel)} ${statusBadge(order.status)}</div>
           </div>
           <button id="close-detail"
-                  class="w-8 h-8 rounded-full bg-zinc-100 hover:bg-zinc-200 flex items-center justify-center transition text-zinc-600 font-bold">
+                  class="w-8 h-8 rounded-full bg-zinc-100 hover:bg-zinc-200 flex items-center justify-center transition font-bold text-zinc-600">
             ✕
           </button>
         </div>
@@ -426,63 +429,116 @@ function orderDetailPanel(order) {
           </select>
         </div>
 
-        <!-- Cliente -->
+        <!-- Datos del cliente (editables) -->
         <div class="detail-section">
-          <p class="detail-label">Cliente</p>
-          <div class="detail-card">
-            <p><strong>Email:</strong> ${order.email || '—'}</p>
-            <p><strong>WhatsApp:</strong> ${order.whatsapp}</p>
-            <p><strong>Ciudad:</strong> ${order.city}</p>
-            <p><strong>Dirección:</strong> ${order.address}</p>
+          <p class="detail-label">Datos del cliente</p>
+          <div class="flex flex-col gap-3">
+            <div>
+              <label class="detail-sublabel">Nombre</label>
+              <input type="text" class="input text-sm" id="edit-name" value="${order.name || ''}" />
+            </div>
+            <div>
+              <label class="detail-sublabel">Email</label>
+              <input type="email" class="input text-sm" id="edit-email" value="${order.email || ''}" />
+            </div>
+            <div>
+              <label class="detail-sublabel">WhatsApp</label>
+              <input type="tel" class="input text-sm" id="edit-whatsapp" value="${order.whatsapp || ''}" />
+            </div>
+            <div>
+              <label class="detail-sublabel">Ciudad</label>
+              <input type="text" class="input text-sm" id="edit-city" value="${order.city || ''}" />
+            </div>
+            <div>
+              <label class="detail-sublabel">Dirección</label>
+              <textarea class="input text-sm" id="edit-address" rows="2">${order.address || ''}</textarea>
+            </div>
           </div>
           <a href="https://wa.me/${order.whatsapp?.replace(/\D/g,'')}"
              target="_blank"
-             class="mt-2 inline-flex items-center gap-2 bg-green-500 text-white text-sm font-bold px-4 py-2 rounded-xl hover:bg-green-600 transition">
+             class="mt-3 inline-flex items-center gap-2 bg-green-500 text-white text-sm font-bold px-4 py-2 rounded-xl hover:bg-green-600 transition">
             Abrir WhatsApp →
           </a>
         </div>
 
-        <!-- Pedido -->
+        <!-- Pedido (editable) -->
         <div class="detail-section">
           <p class="detail-label">Pedido</p>
-          <div class="detail-card">
-            <p><strong>Batch:</strong> ${batch?.label || order.batch_id}</p>
-            <p><strong>Cantidad:</strong> ${order.quantity} álbum(es)</p>
-            <p><strong>Canal:</strong> ${order.channel}</p>
-            <p><strong>Método de pago:</strong> ${order.payment_method}</p>
-            <p><strong>Comprobante:</strong> ${order.has_proof ? '✅ Recibido' : '❌ Pendiente'}</p>
+          <div class="flex flex-col gap-3">
+            <div>
+              <label class="detail-sublabel">Batch</label>
+              <select class="input text-sm" id="edit-batch">
+                ${BATCHES.map(b =>
+                  `<option value="${b.id}" ${order.batch_id === b.id ? 'selected' : ''}>${b.label}</option>`
+                ).join('')}
+              </select>
+            </div>
+            <div>
+              <label class="detail-sublabel">Cantidad</label>
+              <input type="number" class="input text-sm" id="edit-quantity" min="1" max="10" value="${order.quantity || 1}" />
+            </div>
           </div>
         </div>
 
-        <!-- Fotos -->
+        <!-- Link de fotos (editable) -->
         <div class="detail-section">
           <p class="detail-label">Link de fotos</p>
-          <div class="flex gap-2">
-            <input type="url" id="edit-photos" value="${order.photos_link || ''}"
-                   placeholder="https://drive.google.com/..."
-                   class="input flex-1 text-sm" />
-            <button id="save-photos" data-order-id="${order.order_id}"
-                    class="bg-zinc-900 text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-zinc-700 transition whitespace-nowrap">
-              Guardar
-            </button>
-          </div>
+          <input type="url" id="edit-photos" value="${order.photos_link || ''}"
+                 placeholder="https://drive.google.com/..."
+                 class="input text-sm" />
           ${order.photos_link ? `
             <a href="${order.photos_link}" target="_blank"
-               class="mt-2 inline-block text-xs text-blue-600 hover:underline">
-              Ver fotos →
-            </a>
+               class="mt-2 inline-block text-xs text-blue-600 hover:underline">Ver fotos →</a>
           ` : ''}
         </div>
 
-        <!-- Notas -->
+        <!-- Notas (editable) -->
         <div class="detail-section">
           <p class="detail-label">Notas</p>
           <textarea id="edit-notes" rows="3" class="input text-sm"
                     placeholder="Sin notas...">${order.notes || ''}</textarea>
-          <button id="save-notes" data-order-id="${order.order_id}"
-                  class="mt-2 bg-zinc-900 text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-zinc-700 transition">
-            Guardar notas
-          </button>
+        </div>
+
+        <!-- Botón guardar todo -->
+        <button id="save-all" data-order-id="${order.order_id}"
+                class="w-full bg-zinc-900 text-white font-display font-bold py-3 rounded-xl hover:bg-zinc-700 transition mb-4">
+          Guardar cambios
+        </button>
+        <p id="save-msg" class="text-center text-sm text-green-600 hidden">¡Cambios guardados!</p>
+
+        <!-- Comprobante de pago -->
+        <div class="detail-section">
+          <p class="detail-label">Comprobante de pago</p>
+
+          ${order.proof_url ? `
+            <div class="mb-3">
+              <img src="${order.proof_url}" alt="Comprobante"
+                   class="w-full rounded-xl border border-zinc-200 object-cover max-h-64" />
+              <a href="${order.proof_url}" target="_blank"
+                 class="mt-2 inline-block text-xs text-blue-600 hover:underline">
+                Ver en tamaño completo →
+              </a>
+            </div>
+          ` : `
+            <div class="bg-zinc-50 rounded-xl p-4 text-center text-zinc-400 text-sm mb-3">
+              Sin comprobante aún
+            </div>
+          `}
+
+          <div>
+            <label class="detail-sublabel">Subir comprobante</label>
+            <input type="file" id="proof-upload" accept="image/jpeg,image/png,application/pdf"
+                   class="block w-full text-sm text-zinc-500 mt-1
+                          file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0
+                          file:bg-zinc-900 file:text-white file:font-bold file:cursor-pointer
+                          hover:file:bg-zinc-700" />
+            <button id="upload-proof-btn" data-order-id="${order.order_id}"
+                    class="mt-3 w-full bg-blue-600 text-white font-bold py-2.5 rounded-xl hover:bg-blue-700 transition text-sm disabled:opacity-50"
+                    disabled>
+              Subir comprobante
+            </button>
+            <p id="proof-msg" class="text-center text-sm mt-2 hidden"></p>
+          </div>
         </div>
 
         <!-- Total -->
@@ -491,11 +547,13 @@ function orderDetailPanel(order) {
           <div class="detail-card">
             <p><strong>Subtotal:</strong> ${formatCOP(order.subtotal)}</p>
             <p><strong>Envío:</strong> ${formatCOP(order.shipping)}</p>
-            <p class="text-lg font-black mt-2"><strong>Total:</strong> ${formatCOP(order.total)}</p>
+            <p class="text-lg font-black mt-2">Total: ${formatCOP(order.total)}</p>
           </div>
         </div>
 
-        <p class="text-xs text-zinc-400 mt-4">Pedido recibido el ${formatDate(order.created_at)}</p>
+        <p class="text-xs text-zinc-400 text-center mt-2">
+          Pedido recibido el ${formatDate(order.created_at)}
+        </p>
       </div>
     </div>
   `
@@ -704,72 +762,127 @@ function attachEvents() {
 }
 
 function openDetailPanel(order) {
-  // Remover panel anterior si existe
   document.getElementById('detail-overlay')?.remove()
 
-  // Agregar panel al body
   const div = document.createElement('div')
   div.innerHTML = orderDetailPanel(order)
   document.body.appendChild(div.firstElementChild)
 
-  // Cerrar al hacer clic en el overlay
-  document.getElementById('detail-overlay')?.addEventListener('click', (e) => {
+  // Cerrar
+  document.getElementById('detail-overlay')?.addEventListener('click', e => {
     if (e.target.id === 'detail-overlay') closeDetailPanel()
   })
-
-  // Botón cerrar
   document.getElementById('close-detail')?.addEventListener('click', closeDetailPanel)
 
-  // Cambiar estado desde el panel
-  document.querySelector('.detail-status-select')?.addEventListener('change', async (e) => {
-    const orderId = e.target.dataset.orderId
+  // Cambiar estado
+  document.querySelector('.detail-status-select')?.addEventListener('change', async e => {
     try {
       const { order: updated } = await api('/api/admin/update-status', 'POST', {
-        order_id: orderId, status: e.target.value
+        order_id: e.target.dataset.orderId,
+        status: e.target.value
       })
-      const idx = state.orders.findIndex(o => o.order_id === orderId)
-      if (idx !== -1) state.orders[idx] = updated
-    } catch {
-      alert('Error al actualizar el estado.')
-    }
+      updateOrderInState(updated)
+    } catch { alert('Error al actualizar el estado.') }
   })
 
-  // Guardar fotos
-  document.getElementById('save-photos')?.addEventListener('click', async () => {
-    const orderId = document.getElementById('save-photos').dataset.orderId
-    const photosLink = document.getElementById('edit-photos').value
+  // Guardar todos los campos
+  document.getElementById('save-all')?.addEventListener('click', async () => {
+    const btn    = document.getElementById('save-all')
+    const msg    = document.getElementById('save-msg')
+    const orderId = btn.dataset.orderId
+
+    btn.disabled = true
+    btn.textContent = 'Guardando...'
+    msg.classList.add('hidden')
+
     try {
-      const { order: updated } = await api('/api/admin/update-status', 'POST', {
-        order_id: orderId, photos_link: photosLink
+      const { order: updated } = await api('/api/admin/update-order', 'POST', {
+        order_id:   orderId,
+        name:       document.getElementById('edit-name').value,
+        email:      document.getElementById('edit-email').value,
+        whatsapp:   document.getElementById('edit-whatsapp').value,
+        city:       document.getElementById('edit-city').value,
+        address:    document.getElementById('edit-address').value,
+        batch_id:   document.getElementById('edit-batch').value,
+        quantity:   document.getElementById('edit-quantity').value,
+        photos_link: document.getElementById('edit-photos').value,
+        notes:      document.getElementById('edit-notes').value
       })
-      const idx = state.orders.findIndex(o => o.order_id === orderId)
-      if (idx !== -1) state.orders[idx] = updated
-      document.getElementById('save-photos').textContent = '¡Guardado!'
-      setTimeout(() => {
-        document.getElementById('save-photos').textContent = 'Guardar'
-      }, 2000)
+
+      updateOrderInState(updated)
+      msg.textContent = '¡Cambios guardados!'
+      msg.classList.remove('hidden')
     } catch {
-      alert('Error al guardar el link.')
+      msg.textContent = 'Error al guardar.'
+      msg.classList.remove('hidden')
+      msg.style.color = 'red'
     }
+
+    btn.disabled = false
+    btn.textContent = 'Guardar cambios'
   })
 
-  // Guardar notas
-  document.getElementById('save-notes')?.addEventListener('click', async () => {
-    const orderId = document.getElementById('save-notes').dataset.orderId
-    const notes = document.getElementById('edit-notes').value
+  // Habilitar botón de subir comprobante al seleccionar archivo
+  const proofInput = document.getElementById('proof-upload')
+  const proofBtn   = document.getElementById('upload-proof-btn')
+
+  proofInput?.addEventListener('change', () => {
+    proofBtn.disabled = !proofInput.files.length
+  })
+
+  // Subir comprobante
+  proofBtn?.addEventListener('click', async () => {
+    const file    = proofInput.files[0]
+    const orderId = proofBtn.dataset.orderId
+    const msgEl   = document.getElementById('proof-msg')
+
+    if (!file) return
+
+    proofBtn.disabled = true
+    proofBtn.textContent = 'Subiendo...'
+    msgEl.classList.add('hidden')
+
     try {
-      const { order: updated } = await api('/api/admin/update-status', 'POST', {
-        order_id: orderId, notes
+      const base64 = await fileToBase64(file)
+      const { order: updated } = await api('/api/admin/upload-proof', 'POST', {
+        order_id:    orderId,
+        filename:    file.name,
+        contentType: file.type,
+        data:        base64
       })
-      const idx = state.orders.findIndex(o => o.order_id === orderId)
-      if (idx !== -1) state.orders[idx] = updated
-      document.getElementById('save-notes').textContent = '¡Guardado!'
+
+      updateOrderInState(updated)
+      msgEl.textContent = '¡Comprobante subido!'
+      msgEl.style.color = 'green'
+      msgEl.classList.remove('hidden')
+
+      // Reabrir el panel con datos actualizados
       setTimeout(() => {
-        document.getElementById('save-notes').textContent = 'Guardar notas'
-      }, 2000)
+        closeDetailPanel()
+        openDetailPanel(updated)
+      }, 800)
     } catch {
-      alert('Error al guardar las notas.')
+      msgEl.textContent = 'Error al subir el archivo.'
+      msgEl.style.color = 'red'
+      msgEl.classList.remove('hidden')
     }
+
+    proofBtn.disabled = false
+    proofBtn.textContent = 'Subir comprobante'
+  })
+}
+
+function updateOrderInState(updated) {
+  const idx = state.orders.findIndex(o => o.order_id === updated.order_id)
+  if (idx !== -1) state.orders[idx] = updated
+}
+
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload  = () => resolve(reader.result.split(',')[1])
+    reader.onerror = reject
+    reader.readAsDataURL(file)
   })
 }
 
