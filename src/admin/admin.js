@@ -578,13 +578,6 @@ function orderDetailPanel(order, editMode = false) {
       </div>
     </div>
   `
-
-  document.querySelector('.proof-fullscreen')?.addEventListener('click', e => {
-  const url = e.target.dataset.url
-  const w = window.open('', '_blank')
-  w.document.write(`<html><body style="margin:0;background:#000;display:flex;align-items:center;justify-content:center;min-height:100vh"><img src="${url}" style="max-width:100%;max-height:100vh;object-fit:contain"></body></html>`)
-  w.document.close()
-})
 }
 
 // ─── Render ─────────────────────────────────────────────────────────────────
@@ -909,6 +902,13 @@ function openDetailPanel(order, editMode = false) {
       proofBtn.textContent = 'Subir comprobante'
     }
   })
+
+    document.querySelector('.proof-fullscreen')?.addEventListener('click', e => {
+      const url = e.target.dataset.url
+      const w = window.open('', '_blank')
+      w.document.write(`<html><body style="margin:0;background:#000;display:flex;align-items:center;justify-content:center;min-height:100vh"><img src="${url}" style="max-width:100%;max-height:100vh;object-fit:contain"></body></html>`)
+      w.document.close()
+    })
 }
 
 function updateOrderInState(updated) {
