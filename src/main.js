@@ -1,4 +1,5 @@
 import './style.css'
+import { loadBatches } from './data/batches.js'
 import { navbar, setupNavbar } from './components/navbar.js'
 import { hero } from './sections/hero.js'
 import { howItWorks } from './sections/how-it-works.js'
@@ -10,19 +11,24 @@ import { orderForm } from './form/form.js'
 import { setupForm } from './form/submit.js'
 import { setupCarousel } from './components/album-carousel.js'
 
-const app = document.querySelector('#app')
+async function init() {
+  await loadBatches()
 
-app.innerHTML = `
-  ${navbar()}
-  ${hero()}
-  ${howItWorks()}
-  ${insideAlbum()}
-  ${batchesSection()}
-  ${faq()}
-  ${orderForm()}
-  ${footer()}
-`
+  const app = document.querySelector('#app')
+  app.innerHTML = `
+    ${navbar()}
+    ${hero()}
+    ${howItWorks()}
+    ${insideAlbum()}
+    ${batchesSection()}
+    ${faq()}
+    ${orderForm()}
+    ${footer()}
+  `
 
-setupNavbar()
-setupForm()
-setupCarousel()
+  setupNavbar()
+  setupForm()
+  setupCarousel()
+}
+
+init()

@@ -28,6 +28,13 @@ export default async function handler(req, res) {
         ${parseInt(subtotal)}, ${parseInt(shipping)}, ${parseInt(total)}, 'whatsapp'
       )
     `
+    await sql`
+      UPDATE batches
+      SET spots_left = GREATEST(spots_left - ${parseInt(quantity)}, 0)
+      WHERE id = ${batch_id}
+    `
+
+
     return res.status(200).json({ success: true, order_id })
   } catch (error) {
     console.error(error)

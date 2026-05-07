@@ -127,6 +127,9 @@ function viewDashboard() {
           <button data-view="create" class="nav-btn bg-zinc-900 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-zinc-700 transition">
             + Nuevo pedido
           </button>
+          <button data-view="batches" class="nav-btn bg-white border border-zinc-200 text-zinc-700 px-4 py-2 rounded-xl text-sm font-semibold hover:border-zinc-900 transition">
+            Gestionar batches
+          </button>
         </div>
       </div>
 
@@ -176,6 +179,97 @@ function viewDashboard() {
       </div>
     </div>
   `;
+}
+
+function viewBatches() {
+  return `
+    <div class="p-6 max-w-4xl mx-auto">
+      <button data-view="dashboard" class="nav-btn text-zinc-500 text-sm hover:text-zinc-900 transition mb-4">← Dashboard</button>
+      <h1 class="font-display font-black text-2xl mb-6">Gestionar batches</h1>
+
+      <div id="batches-list" class="flex flex-col gap-4">
+        <p class="text-zinc-400 animate-pulse">Cargando...</p>
+      </div>
+    </div>
+  `
+}
+
+async function loadAdminBatches() {
+  const { batches } = await api('/api/admin/batches')
+
+  document.getElementById('batches-list').innerHTML = batches.map(b => `
+    <div class="bg-white rounded-2xl border border-zinc-100 shadow-sm p-6">
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <p class="font-display font-black text-lg">${b.label}</p>
+          <p class="text-zinc-400 text-sm">📷 ${b.deadline} · 📦 ${b.delivery}</p>
+        </div>
+        <label class="flex items-center gap-2 cursor-pointer">
+          <span class="text-sm font-semibold text-zinc-600">Activo</span>
+          <input type="checkbox" class="batch-active-toggle w-4 h-4 cursor-pointer"
+                 data-batch-id="${b.id}"
+                 ${b.active ? 'checked' : ''} />
+        </label>
+      </div>
+
+      <div class="grid grid-cols-3 gap-4">
+        <div>
+          <label class="detail-sublabel">Precio</label>
+          <input type="number" class="input text-sm" id="price-${b.id}"
+                 value="${b.price}" />
+        </div>
+        <div>
+          <label class="detail-sublabel">Cupos disponibles</label>
+          <input type="number" class="input text-sm" id="spots-${b.id}"
+                 value="${b.spots_left}" min="0" max="${b.spots}" />
+        </div>
+        <div class="flex items-end">
+          <button class="batch-save-btn w-full bg-zinc-900 text-white font-bold py-2.5 rounded-xl hover:bg-zinc-700 transition text-sm"
+                  data-batch-id="${b.id}">
+            Guardar
+          </button>
+        </div>
+      </div>
+
+      <!-- Barra de cupos -->
+      <div class="mt-4">
+        <div class="flex justify-between text-xs text-zinc-400 mb-1">
+          <span>Cupos</span>
+          <span>${b.spots_left}/${b.spots}</span>
+        </div>
+        <div class="h-2 bg-zinc-100 rounded-full overflow-hidden">
+          <div class="h-full rounded-full ${b.spots_left > b.spots * 0.5 ? 'bg-green-500' : b.spots_left > b.spots * 0.2 ? 'bg-yellow-400' : 'bg-red-500'}"
+               style="width:${Math.round((b.spots_left / b.spots) * 100)}%">
+          </div>
+        </div>
+      </div>
+    </div>
+  `).join('')
+
+  // Listeners de guardar
+  document.querySelectorAll('.batch-save-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const id        = btn.dataset.batchId
+      const spotsLeft = document.getElementById(`spots-${id}`).value
+      const price     = document.getElementById(`price-${id}`).value
+      const active    = document.querySelector(`.batch-active-toggle[data-batch-id="${id}"]`).checked
+
+      btn.textContent = 'Guardando...'
+      btn.disabled    = true
+
+      try {
+        await api('/api/admin/batches', 'POST', { id, spots_left: spotsLeft, price, active })
+        btn.textContent = '¡Guardado!'
+        setTimeout(() => {
+          btn.textContent = 'Guardar'
+          btn.disabled    = false
+        }, 2000)
+      } catch {
+        btn.textContent = 'Error'
+        btn.disabled    = false
+      }
+    })
+  })
 }
 
 function ordersTable(orders) {
@@ -610,6 +704,11 @@ function render() {
     case 'create':
       app.innerHTML = viewCreate();
       break;
+    case 'batches':
+      app.innerHTML = viewBatches()
+      attachEvents()
+      loadAdminBatches()
+      break
   }
 
   attachEvents();

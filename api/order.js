@@ -40,6 +40,12 @@ export default async function handler(req, res) {
         ${payment_method}, ${proof ? true : false}
       )
     `
+    // Descontar cupo del batch
+    await sql`
+      UPDATE batches
+      SET spots_left = GREATEST(spots_left - ${parseInt(quantity)}, 0)
+      WHERE id = ${batch_id}
+    `
 
     // --- Resto del código de los correos (igual que antes) ---
 

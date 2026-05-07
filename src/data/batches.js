@@ -78,3 +78,37 @@ export function getBatch(id) {
 export function activeBatches() {
   return BATCHES.filter(b => b.active && b.spotsLeft > 0)
 }
+
+export let BATCHES = []
+
+export async function loadBatches() {
+  try {
+    const res  = await fetch('/api/batches')
+    const data = await res.json()
+    BATCHES = data.batches.map(b => ({
+      id:            b.id,
+      label:         b.label,
+      deadline:      b.deadline,
+      delivery:      b.delivery,
+      price:         b.price,
+      currency:      b.currency,
+      country:       b.country,
+      discount:      b.discount,
+      discountLabel: b.discount_label,
+      spots:         b.spots,
+      spotsLeft:     b.spots_left,
+      active:        b.active
+    }))
+    return BATCHES
+  } catch {
+    return BATCHES
+  }
+}
+
+export function getBatch(id) {
+  return BATCHES.find(b => b.id === id)
+}
+
+export function activeBatches() {
+  return BATCHES.filter(b => b.active && b.spots_left > 0)
+}
