@@ -104,11 +104,3 @@ export async function loadBatches() {
     return BATCHES
   }
 }
-
-export function getBatch(id) {
-  return BATCHES.find(b => b.id === id)
-}
-
-export function activeBatches() {
-  return BATCHES.filter(b => b.active && b.spots_left > 0)
-}
