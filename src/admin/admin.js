@@ -87,6 +87,60 @@ function statusBadge(status) {
   return `<span class="status-badge status-${status}">${dot}${STATUS_LABELS[status] || status}</span>`;
 }
 
+function statusCellHtml(status) {
+  const color = STATUS_LIGHT[status] || '#a1a1aa';
+  return `
+    <div class="flex items-center gap-2 cursor-pointer select-none">
+      <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${color};flex-shrink:0;box-shadow:0 0 0 2px white,0 0 0 3px ${color}33;"></span>
+      <span class="text-xs font-semibold text-zinc-700">${STATUS_LABELS[status] || status}</span>
+      <svg class="w-3 h-3 text-zinc-400 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+    </div>`;
+}
+
+let _activeDropdown = null;
+
+function closeStatusDropdown() {
+  _activeDropdown?.remove();
+  _activeDropdown = null;
+}
+
+function showStatusDropdown(triggerEl, orderId, currentStatus) {
+  closeStatusDropdown();
+  const rect = triggerEl.getBoundingClientRect();
+  const drop = document.createElement('div');
+  drop.style.cssText = `position:fixed;top:${rect.bottom + 4}px;left:${rect.left}px;z-index:9999;
+    background:white;border:1px solid #e4e4e7;border-radius:12px;
+    box-shadow:0 4px 20px rgba(0,0,0,0.12);padding:4px;min-width:190px;`;
+  drop.innerHTML = Object.entries(STATUS_LABELS).map(([val, label]) => `
+    <div data-val="${val}" style="display:flex;align-items:center;gap:8px;padding:7px 12px;border-radius:8px;
+      cursor:pointer;font-size:13px;font-weight:600;background:${val === currentStatus ? '#f4f4f5' : 'transparent'}">
+      <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${STATUS_LIGHT[val]};flex-shrink:0;"></span>
+      <span>${label}</span>
+      ${val === currentStatus ? '<span style="margin-left:auto;font-size:11px;font-weight:400;color:#a1a1aa;">actual</span>' : ''}
+    </div>`).join('');
+
+  drop.querySelectorAll('[data-val]').forEach(opt => {
+    opt.addEventListener('mouseenter', () => { if (opt.dataset.val !== currentStatus) opt.style.background = '#f9fafb'; });
+    opt.addEventListener('mouseleave', () => { if (opt.dataset.val !== currentStatus) opt.style.background = 'transparent'; });
+  });
+
+  drop.addEventListener('click', async e => {
+    const opt = e.target.closest('[data-val]');
+    if (!opt) return;
+    const newStatus = opt.dataset.val;
+    closeStatusDropdown();
+    if (newStatus === currentStatus) return;
+    try {
+      const { order: updated } = await api('/api/admin/update-status', 'POST', { order_id: orderId, status: newStatus });
+      updateOrderInState(updated);
+    } catch { alert('Error al actualizar el estado.'); }
+  });
+
+  document.body.appendChild(drop);
+  _activeDropdown = drop;
+  setTimeout(() => document.addEventListener('click', closeStatusDropdown, { once: true }), 0);
+}
+
 function channelBadge(channel) {
   const label = channel === 'web' ? '🌐 Web' : '💬 WhatsApp';
   return `<span class="channel-badge channel-${channel}">${label}</span>`;
@@ -330,13 +384,7 @@ function ordersTable(orders) {
             <td class="px-4 py-3 font-semibold text-center">${o.quantity}</td>
             <td class="px-4 py-3 font-bold">${formatCOP(o.total)}</td>
             <td class="px-4 py-3">${channelBadge(o.channel)}</td>
-            <td class="px-4 py-3">
-              <div class="flex items-center gap-2">
-                <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${STATUS_LIGHT[o.status] || '#a1a1aa'};flex-shrink:0;box-shadow:0 0 0 2px white,0 0 0 3px ${STATUS_LIGHT[o.status] || '#a1a1aa'}33;"></span>
-                <span class="text-xs font-semibold text-zinc-700">${STATUS_LABELS[o.status] || o.status}</span>
-                <svg class="w-3 h-3 text-zinc-400 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
-              </div>
-            </td>
+            <td class="px-4 py-3 status-cell" data-order-id="${o.order_id}">${statusCellHtml(o.status)}</td>
             <td class="px-4 py-3 text-xs text-zinc-400">${formatDate(o.created_at)}</td>
             <td class="px-4 py-3">
               <a href="https://wa.me/${o.whatsapp?.replace(/\D/g, '')}"
@@ -916,11 +964,22 @@ function attachEvents() {
       }
     });
 
+  // Dropdown de estado en celda
+  document.querySelectorAll('td.status-cell').forEach(td => {
+    td.addEventListener('click', e => {
+      e.stopPropagation();
+      const orderId = td.dataset.orderId;
+      const order = state.orders.find(o => o.order_id === orderId);
+      if (!order) return;
+      showStatusDropdown(td, orderId, order.status);
+    });
+  });
+
   // Abrir panel de detalles al hacer clic en una fila
   document.querySelectorAll('tbody tr[data-order-id]').forEach(row => {
     row.style.cursor = 'pointer'
     row.addEventListener('click', (e) => {
-      if (e.target.closest('a')) return
+      if (e.target.closest('a') || e.target.closest('.status-cell')) return
 
       const orderId = row.dataset.orderId
       const order = state.orders.find(o => o.order_id === orderId)
@@ -1136,6 +1195,14 @@ function updateOrderInState(updated) {
   const idx = state.orders.findIndex(o => o.order_id === updated.order_id)
   if (idx !== -1) state.orders[idx] = updated
   recalculateStats()
+
+  // Actualizar filas visibles sin re-render completo
+  document.querySelectorAll(`tr[data-order-id="${updated.order_id}"]`).forEach(row => {
+    Object.keys(STATUS_LIGHT).forEach(s => row.classList.remove(`row-${s}`))
+    row.classList.add(`row-${updated.status}`)
+    const cell = row.querySelector('td.status-cell')
+    if (cell) cell.innerHTML = statusCellHtml(updated.status)
+  })
 }
 
 function fileToBase64(file) {
