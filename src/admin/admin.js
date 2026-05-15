@@ -140,16 +140,20 @@ function viewDashboard() {
           <p class="font-display font-black text-3xl" id="stat-total">${s?.total_orders || 0}</p>
         </div>
         <div class="bg-zinc-900 rounded-2xl p-5 shadow-sm text-white">
-          <p class="text-zinc-400 text-xs font-semibold uppercase tracking-wider mb-1">Ingresos totales</p>
+          <p class="text-zinc-400 text-xs font-semibold uppercase tracking-wider mb-1">Ingresos confirmados</p>
           <p class="font-display font-black text-3xl" id="stat-revenue">${formatCOP(s?.total_revenue)}</p>
         </div>
-        <div class="bg-white rounded-2xl p-5 shadow-sm border border-zinc-100">
-          <p class="text-zinc-500 text-xs font-semibold uppercase tracking-wider mb-1">Web</p>
-          <p class="font-display font-black text-3xl" id="stat-web">${s?.web_orders || 0}</p>
+        <div class="bg-amber-50 rounded-2xl p-5 shadow-sm border border-amber-100">
+          <p class="text-amber-600 text-xs font-semibold uppercase tracking-wider mb-1">Pagos pendientes</p>
+          <p class="font-display font-black text-3xl text-amber-700" id="stat-pending-revenue">${formatCOP(s?.pending_revenue || 0)}</p>
         </div>
         <div class="bg-white rounded-2xl p-5 shadow-sm border border-zinc-100">
-          <p class="text-zinc-500 text-xs font-semibold uppercase tracking-wider mb-1">WhatsApp</p>
-          <p class="font-display font-black text-3xl" id="stat-wa">${s?.wa_orders || 0}</p>
+          <p class="text-zinc-500 text-xs font-semibold uppercase tracking-wider mb-1">Web / WhatsApp</p>
+          <p class="font-display font-black text-3xl">
+            <span id="stat-web">${s?.web_orders || 0}</span>
+            <span class="text-zinc-300 font-light">/</span>
+            <span id="stat-wa">${s?.wa_orders || 0}</span>
+          </p>
         </div>
       </div>
 
@@ -1024,9 +1028,16 @@ function openDetailPanel(order, editMode = false) {
 
 function recalculateStats() {
   const o = state.orders
+
+  const confirmedStatuses = ['confirmed', 'production', 'shipped', 'delivered']
+  const pendingStatuses   = ['pending', 'paid_pending_review']
+
   state.stats = {
     total_orders:        o.length,
-    total_revenue:       o.reduce((sum, x) => sum + (parseInt(x.total) || 0), 0),
+    total_revenue:       o.filter(x => confirmedStatuses.includes(x.status))
+                          .reduce((sum, x) => sum + (parseInt(x.total) || 0), 0),
+    pending_revenue:     o.filter(x => pendingStatuses.includes(x.status))
+                          .reduce((sum, x) => sum + (parseInt(x.total) || 0), 0),
     web_orders:          o.filter(x => x.channel === 'web').length,
     wa_orders:           o.filter(x => x.channel === 'whatsapp').length,
     pending:             o.filter(x => x.status === 'pending').length,
@@ -1041,20 +1052,19 @@ function recalculateStats() {
   console.log('stats calculados:', state.stats)
   console.log('grid existe?', !!document.getElementById('stats-status-grid'))
   console.log('stat-cancelled existe?', !!document.getElementById('stat-cancelled'))
-  
-  const s = state.stats
 
-  // Actualizar cards principales
+  const s   = state.stats
   const set = (id, val) => {
     const el = document.getElementById(id)
     if (el) el.textContent = val
   }
-  set('stat-total',   s.total_orders)
-  set('stat-revenue', formatCOP(s.total_revenue))
-  set('stat-web',     s.web_orders)
-  set('stat-wa',      s.wa_orders)
 
-  // Re-renderizar grid de estados completo
+  set('stat-total',           s.total_orders)
+  set('stat-revenue',         formatCOP(s.total_revenue))
+  set('stat-pending-revenue', formatCOP(s.pending_revenue))
+  set('stat-web',             s.web_orders)
+  set('stat-wa',              s.wa_orders)
+
   const grid = document.getElementById('stats-status-grid')
   if (grid) {
     grid.innerHTML = Object.entries(STATUS_LABELS).map(([key, label]) => `
