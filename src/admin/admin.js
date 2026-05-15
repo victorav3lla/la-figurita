@@ -1038,23 +1038,28 @@ function recalculateStats() {
     cancelled:           o.filter(x => x.status === 'cancelled').length
   }
 
-  const s   = state.stats
+  const s = state.stats
+
+  // Actualizar cards principales
   const set = (id, val) => {
     const el = document.getElementById(id)
     if (el) el.textContent = val
   }
+  set('stat-total',   s.total_orders)
+  set('stat-revenue', formatCOP(s.total_revenue))
+  set('stat-web',     s.web_orders)
+  set('stat-wa',      s.wa_orders)
 
-  set('stat-total',               s.total_orders)
-  set('stat-revenue',             formatCOP(s.total_revenue))
-  set('stat-web',                 s.web_orders)
-  set('stat-wa',                  s.wa_orders)
-  set('stat-pending',             s.pending)
-  set('stat-paid_pending_review', s.paid_pending_review)
-  set('stat-confirmed',           s.confirmed)
-  set('stat-production',          s.production)
-  set('stat-shipped',             s.shipped)
-  set('stat-delivered',           s.delivered)
-  set('stat-cancelled',           s.cancelled)
+  // Re-renderizar grid de estados completo
+  const grid = document.getElementById('stats-status-grid')
+  if (grid) {
+    grid.innerHTML = Object.entries(STATUS_LABELS).map(([key, label]) => `
+      <div class="bg-white rounded-xl p-4 border border-zinc-100 flex items-center gap-3">
+        ${statusBadge(key)}
+        <span class="font-bold text-lg">${s[key] || 0}</span>
+      </div>
+    `).join('')
+  }
 }
 
 function updateOrderInState(updated) {
