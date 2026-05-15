@@ -23,12 +23,24 @@ html, body {
   white-space: nowrap;
 }
 .status-pending             { background: #fff3e0; color: #9a3412; }
-.status-confirmed           { background: #dcfce7; color: #14532d; }
-.status-paid_pending_review { background: #f7fee7; color: #3f6212; }
+.status-confirmed           { background: #d1fae5; color: #065f46; }
+.status-paid_pending_review { background: #fef3c7; color: #92400e; }
 .status-production          { background: #dbeafe; color: #1e3a8a; }
 .status-shipped             { background: #cffafe; color: #164e63; }
 .status-delivered           { background: #bbf7d0; color: #14532d; }
 .status-cancelled           { background: #fee2e2; color: #7f1d1d; }
+
+.row-pending             { background-color: #fff7ed; }
+.row-confirmed           { background-color: #f0fdf9; }
+.row-paid_pending_review { background-color: #fffbeb; }
+.row-production          { background-color: #f0f9ff; }
+.row-shipped             { background-color: #ecfeff; }
+.row-delivered           { background-color: #f0fdf4; }
+.row-cancelled           { background-color: #fef2f2; }
+.row-pending:hover, .row-confirmed:hover, .row-paid_pending_review:hover,
+.row-production:hover, .row-shipped:hover, .row-delivered:hover, .row-cancelled:hover {
+  filter: brightness(0.96);
+}
 
 .channel-badge {
   display: inline-flex;

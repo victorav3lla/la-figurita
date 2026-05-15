@@ -26,10 +26,10 @@ const STATUS_LABELS = {
 
 const STATUS_LIGHT = {
   pending:             '#f97316',
-  confirmed:           '#22c55e',
-  paid_pending_review: '#d2ec11',
-  production:          '#1428bb',
-  shipped:             '#22b5c5',
+  confirmed:           '#10b981',
+  paid_pending_review: '#f59e0b',
+  production:          '#22b5c5',
+  shipped:             '#1428bb',
   delivered:           '#22c55e',
   cancelled:           '#ef4444',
 };
@@ -307,7 +307,7 @@ function ordersTable(orders) {
         ${orders
           .map(
             (o) => `
-          <tr class="border-b border-zinc-50 hover:bg-zinc-50 transition">
+          <tr class="border-b border-zinc-100 transition row-${o.status}">
             <td class="px-4 py-3 font-mono text-xs font-semibold text-zinc-600">${o.order_id}</td>
             <td class="px-4 py-3">
               <p class="font-semibold">${o.name}</p>
