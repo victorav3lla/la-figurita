@@ -11,13 +11,15 @@ export default async function handler(req, res) {
   }
 
   if (req.method === 'POST') {
-    const { id, spots_left, active, price } = req.body
+    const { id, spots_left, active, price, deadline, delivery } = req.body
     await sql`
       UPDATE batches
       SET
         spots_left = ${parseInt(spots_left)},
         active     = ${active},
-        price      = ${parseInt(price)}
+        price      = ${parseInt(price)},
+        deadline   = ${deadline},
+        delivery   = ${delivery}
       WHERE id = ${id}
     `
     const updated = await sql`SELECT * FROM batches WHERE id = ${id}`
