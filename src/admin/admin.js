@@ -16,8 +16,8 @@ const state = {
 
 const STATUS_LABELS = {
   pending: 'Pago Pendiente',
-  paid_pending_review: 'Fotos Pendientes',
   confirmed: 'Pago confirmado',
+  paid_pending_review: 'Fotos Pendientes',
   production: 'En producción',
   shipped: 'Enviado',
   delivered: 'Entregado',
@@ -26,10 +26,10 @@ const STATUS_LABELS = {
 
 const STATUS_LIGHT = {
   pending:             '#f97316',
-  paid_pending_review: '#22c55e',
   confirmed:           '#22c55e',
-  production:          '#22c55e',
-  shipped:             '#22c55e',
+  paid_pending_review: '#d2ec11',
+  production:          '#1428bb',
+  shipped:             '#22b5c5',
   delivered:           '#22c55e',
   cancelled:           '#ef4444',
 };

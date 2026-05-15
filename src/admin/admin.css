@@ -22,13 +22,13 @@ html, body {
   font-weight: 600;
   white-space: nowrap;
 }
-.status-pending            { background: #fef9c3; color: #713f12; }
-.status-paid_pending_review { background: #ffedd5; color: #7c2d12; }
-.status-confirmed          { background: #dbeafe; color: #1e3a8a; }
-.status-production         { background: #ede9fe; color: #4c1d95; }
-.status-shipped            { background: #ccfbf1; color: #134e4a; }
-.status-delivered          { background: #dcfce7; color: #14532d; }
-.status-cancelled          { background: #fee2e2; color: #7f1d1d; }
+.status-pending             { background: #fff3e0; color: #9a3412; }
+.status-confirmed           { background: #dcfce7; color: #14532d; }
+.status-paid_pending_review { background: #f7fee7; color: #3f6212; }
+.status-production          { background: #dbeafe; color: #1e3a8a; }
+.status-shipped             { background: #cffafe; color: #164e63; }
+.status-delivered           { background: #bbf7d0; color: #14532d; }
+.status-cancelled           { background: #fee2e2; color: #7f1d1d; }
 
 .channel-badge {
   display: inline-flex;
