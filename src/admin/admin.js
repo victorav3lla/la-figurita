@@ -24,6 +24,16 @@ const STATUS_LABELS = {
   cancelled: 'Cancelado',
 };
 
+const STATUS_ICONS = {
+  pending:             '⏳',
+  confirmed:           '💙',
+  paid_pending_review: '📸',
+  production:          '✨',
+  shipped:             '🚀',
+  delivered:           '❤️',
+  cancelled:           '💔',
+};
+
 const STATUS_LIGHT = {
   pending:             '#f97316',
   confirmed:           '#0ea5e9',
@@ -172,8 +182,11 @@ function viewDashboard() {
       <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8" id="stats-status-grid">
         ${Object.entries(STATUS_LABELS).map(([key, label]) => `
           <div class="bg-white rounded-xl p-4 border border-zinc-100 flex items-center gap-3">
-            ${statusBadge(key)}
-            <span class="font-bold text-lg" id="stat-${key}">${s?.[key] || 0}</span>
+            <span class="text-2xl leading-none">${STATUS_ICONS[key]}</span>
+            <div>
+              <p class="font-black text-2xl leading-none" id="stat-${key}">${s?.[key] || 0}</p>
+              <p class="text-xs text-zinc-500 mt-1">${label}</p>
+            </div>
           </div>
         `).join('')}
       </div>
@@ -320,13 +333,8 @@ function ordersTable(orders) {
             <td class="px-4 py-3">
               <div class="flex items-center gap-2">
                 <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${STATUS_LIGHT[o.status] || '#a1a1aa'};flex-shrink:0;box-shadow:0 0 0 2px white,0 0 0 3px ${STATUS_LIGHT[o.status] || '#a1a1aa'}33;"></span>
-                <select class="status-select text-xs border border-zinc-200 rounded-lg px-2 py-1 bg-white cursor-pointer"
-                        data-order-id="${o.order_id}" data-current="${o.status}">
-                  ${Object.entries(STATUS_LABELS)
-                    .map(([val, label]) =>
-                      `<option value="${val}" ${o.status === val ? 'selected' : ''}>${label}</option>`
-                    ).join('')}
-                </select>
+                <span class="text-xs font-semibold text-zinc-700">${STATUS_LABELS[o.status] || o.status}</span>
+                <svg class="w-3 h-3 text-zinc-400 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
               </div>
             </td>
             <td class="px-4 py-3 text-xs text-zinc-400">${formatDate(o.created_at)}</td>
@@ -793,26 +801,7 @@ function attachEvents() {
     });
   });
 
-  // Cambiar estado de un pedido
-  document.querySelectorAll('.status-select').forEach((sel) => {
-    sel.addEventListener('change', async () => {
-      const orderId = sel.dataset.orderId;
-      const status = sel.value;
-      try {
-        await api('/api/admin/update-status', 'POST', {
-          order_id: orderId,
-          status,
-        });
-        const order = state.orders.find((o) => o.order_id === orderId);
-        if (order) order.status = status;
-        // Actualizar stats
-        await loadData();
-      } catch {
-        sel.value = sel.dataset.current;
-        alert('Error al actualizar el estado.');
-      }
-    });
-  });
+
 
   // Filtros
   document.getElementById('filter-status')?.addEventListener('change', (e) => {
@@ -1136,8 +1125,11 @@ function recalculateStats() {
   if (grid) {
     grid.innerHTML = Object.entries(STATUS_LABELS).map(([key, label]) => `
       <div class="bg-white rounded-xl p-4 border border-zinc-100 flex items-center gap-3">
-        ${statusBadge(key)}
-        <span class="font-bold text-lg">${s[key] || 0}</span>
+        <span class="text-2xl leading-none">${STATUS_ICONS[key]}</span>
+        <div>
+          <p class="font-black text-2xl leading-none">${s[key] || 0}</p>
+          <p class="text-xs text-zinc-500 mt-1">${label}</p>
+        </div>
       </div>
     `).join('')
   }
