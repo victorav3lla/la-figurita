@@ -1008,11 +1008,44 @@ function openDetailPanel(order, editMode = false) {
       w.document.write(`<html><body style="margin:0;background:#000;display:flex;align-items:center;justify-content:center;min-height:100vh"><img src="${url}" style="max-width:100%;max-height:100vh;object-fit:contain"></body></html>`)
       w.document.close()
     })
+
+    document.querySelector('.detail-status-select')?.addEventListener('change', async e => {
+      try {
+          const { order: updated } = await api('/api/admin/update-status', 'POST', {
+            order_id: e.target.dataset.orderId,
+            status: e.target.value
+          })
+          updateOrderInState(updated)
+
+          // Actualizar badges del header del panel
+          const badgesEl = e.target.closest('.detail-panel')?.querySelector('.flex.gap-2')
+          if (badgesEl) {
+            badgesEl.innerHTML = `${channelBadge(updated.channel)} ${statusBadge(updated.status)}`
+          }
+      } catch { alert('Error al actualizar el estado.') }
+    })
+}
+
+function recalculateStats() {
+  const o = state.orders
+  state.stats = {
+    total_orders:  o.length,
+    total_revenue: o.reduce((sum, x) => sum + (parseInt(x.total) || 0), 0),
+    web_orders:    o.filter(x => x.channel === 'web').length,
+    wa_orders:     o.filter(x => x.channel === 'whatsapp').length,
+    pending:       o.filter(x => x.status === 'pending').length,
+    paid_pending:  o.filter(x => x.status === 'paid_pending_review').length,
+    confirmed:     o.filter(x => x.status === 'confirmed').length,
+    production:    o.filter(x => x.status === 'production').length,
+    shipped:       o.filter(x => x.status === 'shipped').length,
+    delivered:     o.filter(x => x.status === 'delivered').length
+  }
 }
 
 function updateOrderInState(updated) {
   const idx = state.orders.findIndex(o => o.order_id === updated.order_id)
   if (idx !== -1) state.orders[idx] = updated
+  recalculateStats()
 }
 
 function fileToBase64(file) {
