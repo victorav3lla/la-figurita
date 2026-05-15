@@ -23,16 +23,16 @@ html, body {
   white-space: nowrap;
 }
 .status-pending             { background: #fff3e0; color: #9a3412; }
-.status-confirmed           { background: #d1fae5; color: #065f46; }
-.status-paid_pending_review { background: #fef3c7; color: #92400e; }
+.status-confirmed           { background: #e0f2fe; color: #0c4a6e; }
+.status-paid_pending_review { background: #ede9fe; color: #4c1d95; }
 .status-production          { background: #dbeafe; color: #1e3a8a; }
 .status-shipped             { background: #cffafe; color: #164e63; }
 .status-delivered           { background: #bbf7d0; color: #14532d; }
 .status-cancelled           { background: #fee2e2; color: #7f1d1d; }
 
 .row-pending             { background-color: #fff7ed; }
-.row-confirmed           { background-color: #f0fdf9; }
-.row-paid_pending_review { background-color: #fffbeb; }
+.row-confirmed           { background-color: #f0f9ff; }
+.row-paid_pending_review { background-color: #f5f3ff; }
 .row-production          { background-color: #f0f9ff; }
 .row-shipped             { background-color: #ecfeff; }
 .row-delivered           { background-color: #f0fdf4; }

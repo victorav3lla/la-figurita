@@ -26,8 +26,8 @@ const STATUS_LABELS = {
 
 const STATUS_LIGHT = {
   pending:             '#f97316',
-  confirmed:           '#10b981',
-  paid_pending_review: '#f59e0b',
+  confirmed:           '#0ea5e9',
+  paid_pending_review: '#8b5cf6',
   production:          '#22b5c5',
   shipped:             '#1428bb',
   delivered:           '#22c55e',
