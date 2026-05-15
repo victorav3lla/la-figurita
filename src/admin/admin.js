@@ -1025,35 +1025,36 @@ function openDetailPanel(order, editMode = false) {
 function recalculateStats() {
   const o = state.orders
   state.stats = {
-    total_orders:  o.length,
-    total_revenue: o.reduce((sum, x) => sum + (parseInt(x.total) || 0), 0),
-    web_orders:    o.filter(x => x.channel === 'web').length,
-    wa_orders:     o.filter(x => x.channel === 'whatsapp').length,
-    pending:       o.filter(x => x.status === 'pending').length,
-    paid_pending:  o.filter(x => x.status === 'paid_pending_review').length,
-    confirmed:     o.filter(x => x.status === 'confirmed').length,
-    production:    o.filter(x => x.status === 'production').length,
-    shipped:       o.filter(x => x.status === 'shipped').length,
-    delivered:     o.filter(x => x.status === 'delivered').length
+    total_orders:        o.length,
+    total_revenue:       o.reduce((sum, x) => sum + (parseInt(x.total) || 0), 0),
+    web_orders:          o.filter(x => x.channel === 'web').length,
+    wa_orders:           o.filter(x => x.channel === 'whatsapp').length,
+    pending:             o.filter(x => x.status === 'pending').length,
+    paid_pending_review: o.filter(x => x.status === 'paid_pending_review').length,
+    confirmed:           o.filter(x => x.status === 'confirmed').length,
+    production:          o.filter(x => x.status === 'production').length,
+    shipped:             o.filter(x => x.status === 'shipped').length,
+    delivered:           o.filter(x => x.status === 'delivered').length,
+    cancelled:           o.filter(x => x.status === 'cancelled').length
   }
 
-  // Actualizar DOM si los elementos existen
-  const s = state.stats
+  const s   = state.stats
   const set = (id, val) => {
     const el = document.getElementById(id)
     if (el) el.textContent = val
   }
 
-  set('stat-total',   s.total_orders)
-  set('stat-revenue', formatCOP(s.total_revenue))
-  set('stat-web',     s.web_orders)
-  set('stat-wa',      s.wa_orders)
+  set('stat-total',               s.total_orders)
+  set('stat-revenue',             formatCOP(s.total_revenue))
+  set('stat-web',                 s.web_orders)
+  set('stat-wa',                  s.wa_orders)
   set('stat-pending',             s.pending)
-  set('stat-paid_pending_review', s.paid_pending)
+  set('stat-paid_pending_review', s.paid_pending_review)
   set('stat-confirmed',           s.confirmed)
   set('stat-production',          s.production)
   set('stat-shipped',             s.shipped)
   set('stat-delivered',           s.delivered)
+  set('stat-cancelled',           s.cancelled)
 }
 
 function updateOrderInState(updated) {
