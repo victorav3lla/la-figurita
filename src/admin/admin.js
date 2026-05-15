@@ -912,12 +912,19 @@ function openDetailPanel(order, editMode = false) {
 
   // Cambiar estado
   document.querySelector('.detail-status-select')?.addEventListener('change', async e => {
+    const orderId  = e.target.dataset.orderId
+    const newStatus = e.target.value
     try {
-      const { order: updated } = await api('/api/admin/update-status', 'POST', {
-        order_id: e.target.dataset.orderId,
-        status: e.target.value
+      await api('/api/admin/update-status', 'POST', {
+        order_id: orderId,
+        status: newStatus
       })
-      updateOrderInState(updated)
+      // Actualizar estado localmente sin depender de la respuesta
+      const order = state.orders.find(o => o.order_id === orderId)
+      if (order) {
+        order.status = newStatus
+        updateOrderInState(order)
+      }
     } catch { alert('Error al actualizar el estado.') }
   })
 
@@ -1029,12 +1036,12 @@ function openDetailPanel(order, editMode = false) {
 function recalculateStats() {
   const o = state.orders
 
-  const confirmedStatuses = ['confirmed', 'production', 'shipped', 'delivered']
-  const pendingStatuses   = ['pending', 'paid_pending_review']
+  const revenueStatuses = ['paid_pending_review', 'confirmed', 'production', 'shipped', 'delivered']
+  const pendingStatuses = ['pending']
 
   state.stats = {
     total_orders:        o.length,
-    total_revenue:       o.filter(x => confirmedStatuses.includes(x.status))
+    total_revenue:       o.filter(x => revenueStatuses.includes(x.status))
                           .reduce((sum, x) => sum + (parseInt(x.total) || 0), 0),
     pending_revenue:     o.filter(x => pendingStatuses.includes(x.status))
                           .reduce((sum, x) => sum + (parseInt(x.total) || 0), 0),
@@ -1048,10 +1055,6 @@ function recalculateStats() {
     delivered:           o.filter(x => x.status === 'delivered').length,
     cancelled:           o.filter(x => x.status === 'cancelled').length
   }
-
-  console.log('stats calculados:', state.stats)
-  console.log('grid existe?', !!document.getElementById('stats-status-grid'))
-  console.log('stat-cancelled existe?', !!document.getElementById('stat-cancelled'))
 
   const s   = state.stats
   const set = (id, val) => {
@@ -1112,7 +1115,7 @@ async function loadData() {
     ])
 
     state.orders = ordersRes.orders
-    state.stats  = ordersRes.stats
+    recalculateStats()
 
     // Poblar BATCHES para que viewCreate los tenga disponibles
     BATCHES.length = 0
