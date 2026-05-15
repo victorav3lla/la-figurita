@@ -320,7 +320,7 @@ function ordersTable(orders) {
         ${orders
           .map(
             (o) => `
-          <tr class="border-b border-zinc-100 transition row-${o.status}">
+          <tr class="border-b border-zinc-100 transition row-${o.status}" data-order-id="${o.order_id}">
             <td class="px-4 py-3 font-mono text-xs font-semibold text-zinc-600">${o.order_id}</td>
             <td class="px-4 py-3">
               <p class="font-semibold">${o.name}</p>
@@ -917,15 +917,12 @@ function attachEvents() {
     });
 
   // Abrir panel de detalles al hacer clic en una fila
-  document.querySelectorAll('tbody tr').forEach(row => {
+  document.querySelectorAll('tbody tr[data-order-id]').forEach(row => {
     row.style.cursor = 'pointer'
     row.addEventListener('click', (e) => {
-      // No abrir si hicieron clic en el select de estado o el link de WA
-      if (e.target.closest('select') || e.target.closest('a')) return
+      if (e.target.closest('a')) return
 
-      const orderId = row.querySelector('.status-select')?.dataset.orderId
-      if (!orderId) return
-
+      const orderId = row.dataset.orderId
       const order = state.orders.find(o => o.order_id === orderId)
       if (!order) return
 
