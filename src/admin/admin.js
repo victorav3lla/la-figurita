@@ -297,6 +297,18 @@ async function loadAdminBatches() {
         </label>
       </div>
 
+      <div class="grid grid-cols-2 gap-4 mb-4">
+        <div>
+          <label class="detail-sublabel">Límite envío de fotos</label>
+          <input type="text" class="input text-sm" id="deadline-${b.id}"
+                 value="${b.deadline}" placeholder="ej. 15 de mayo" />
+        </div>
+        <div>
+          <label class="detail-sublabel">Entrega estimada</label>
+          <input type="text" class="input text-sm" id="delivery-${b.id}"
+                 value="${b.delivery}" placeholder="ej. 22 de mayo" />
+        </div>
+      </div>
       <div class="grid grid-cols-3 gap-4">
         <div>
           <label class="detail-sublabel">Precio</label>
@@ -337,13 +349,15 @@ async function loadAdminBatches() {
       const id        = btn.dataset.batchId
       const spotsLeft = document.getElementById(`spots-${id}`).value
       const price     = document.getElementById(`price-${id}`).value
+      const deadline  = document.getElementById(`deadline-${id}`).value
+      const delivery  = document.getElementById(`delivery-${id}`).value
       const active    = document.querySelector(`.batch-active-toggle[data-batch-id="${id}"]`).checked
 
       btn.textContent = 'Guardando...'
       btn.disabled    = true
 
       try {
-        await api('/api/admin/batches', 'POST', { id, spots_left: spotsLeft, price, active })
+        await api('/api/admin/batches', 'POST', { id, spots_left: spotsLeft, price, deadline, delivery, active })
         btn.textContent = '¡Guardado!'
         setTimeout(() => {
           btn.textContent = 'Guardar'
