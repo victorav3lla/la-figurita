@@ -411,7 +411,7 @@ function viewCreate() {
       <button data-view="dashboard" class="nav-btn text-zinc-500 text-sm hover:text-zinc-900 transition mb-4">← Dashboard</button>
       <h1 class="font-display font-black text-2xl mb-6">Nuevo pedido (WhatsApp)</h1>
 
-      <form id="create-form" class="bg-white rounded-2xl border border-zinc-100 shadow-sm p-6 flex flex-col gap-4">
+      <form id="create-form" class="bg-white rounded-2xl border border-zinc-100 shadow-sm p-6 flex flex-col gap-4" novalidate>
 
         <div class="grid grid-cols-2 gap-4">
           <div class="col-span-2">
