@@ -1038,6 +1038,10 @@ function recalculateStats() {
     cancelled:           o.filter(x => x.status === 'cancelled').length
   }
 
+  console.log('stats calculados:', state.stats)
+  console.log('grid existe?', !!document.getElementById('stats-status-grid'))
+  console.log('stat-cancelled existe?', !!document.getElementById('stat-cancelled'))
+  
   const s = state.stats
 
   // Actualizar cards principales
