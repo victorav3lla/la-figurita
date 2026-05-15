@@ -108,7 +108,7 @@ function showStatusDropdown(triggerEl, orderId, currentStatus) {
   closeStatusDropdown();
   const rect = triggerEl.getBoundingClientRect();
   const drop = document.createElement('div');
-  drop.style.cssText = `position:fixed;top:${rect.bottom + 4}px;left:${rect.left}px;z-index:9999;
+  drop.style.cssText = `position:fixed;top:-9999px;left:-9999px;visibility:hidden;z-index:9999;
     background:white;border:1px solid #e4e4e7;border-radius:12px;
     box-shadow:0 4px 20px rgba(0,0,0,0.12);padding:4px;min-width:190px;`;
   drop.innerHTML = Object.entries(STATUS_LABELS).map(([val, label]) => `
@@ -137,6 +137,13 @@ function showStatusDropdown(triggerEl, orderId, currentStatus) {
   });
 
   document.body.appendChild(drop);
+  const dropH = drop.offsetHeight;
+  const top = (window.innerHeight - rect.bottom) >= dropH + 8
+    ? rect.bottom + 4
+    : rect.top - dropH - 4;
+  drop.style.top = `${top}px`;
+  drop.style.left = `${rect.left}px`;
+  drop.style.visibility = 'visible';
   _activeDropdown = drop;
   setTimeout(() => document.addEventListener('click', closeStatusDropdown, { once: true }), 0);
 }
@@ -186,7 +193,7 @@ function viewLogin() {
 
 function viewDashboard() {
   const s = state.stats;
-  const recent = state.orders.slice(0, 8);
+  const recent = state.orders.slice(0, 10);
 
   return `
     <div class="p-6 max-w-7xl mx-auto">

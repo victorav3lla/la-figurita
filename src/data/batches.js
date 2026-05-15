@@ -4,7 +4,7 @@ const BATCHES_FALLBACK = [
   {
     id: 'batch1',
     label: 'Batch 1 · Precio lanzamiento',
-    deadline: '12 de mayo',
+    deadline: '15 de mayo',
     delivery: '22 de mayo',
     price: 99900,
     currency: 'COP',
