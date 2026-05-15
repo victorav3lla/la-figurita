@@ -137,34 +137,30 @@ function viewDashboard() {
       <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         <div class="bg-white rounded-2xl p-5 shadow-sm border border-zinc-100">
           <p class="text-zinc-500 text-xs font-semibold uppercase tracking-wider mb-1">Total pedidos</p>
-          <p class="font-display font-black text-3xl">${s?.total_orders || 0}</p>
+          <p class="font-display font-black text-3xl" id="stat-total">${s?.total_orders || 0}</p>
         </div>
         <div class="bg-zinc-900 rounded-2xl p-5 shadow-sm text-white">
           <p class="text-zinc-400 text-xs font-semibold uppercase tracking-wider mb-1">Ingresos totales</p>
-          <p class="font-display font-black text-3xl">${formatCOP(s?.total_revenue)}</p>
+          <p class="font-display font-black text-3xl" id="stat-revenue">${formatCOP(s?.total_revenue)}</p>
         </div>
         <div class="bg-white rounded-2xl p-5 shadow-sm border border-zinc-100">
           <p class="text-zinc-500 text-xs font-semibold uppercase tracking-wider mb-1">Web</p>
-          <p class="font-display font-black text-3xl">${s?.web_orders || 0}</p>
+          <p class="font-display font-black text-3xl" id="stat-web">${s?.web_orders || 0}</p>
         </div>
         <div class="bg-white rounded-2xl p-5 shadow-sm border border-zinc-100">
           <p class="text-zinc-500 text-xs font-semibold uppercase tracking-wider mb-1">WhatsApp</p>
-          <p class="font-display font-black text-3xl">${s?.wa_orders || 0}</p>
+          <p class="font-display font-black text-3xl" id="stat-wa">${s?.wa_orders || 0}</p>
         </div>
       </div>
 
       <!-- Status overview -->
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
-        ${Object.entries(STATUS_LABELS)
-          .map(
-            ([key, label]) => `
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8" id="stats-status-grid">
+        ${Object.entries(STATUS_LABELS).map(([key, label]) => `
           <div class="bg-white rounded-xl p-4 border border-zinc-100 flex items-center gap-3">
             ${statusBadge(key)}
-            <span class="font-bold text-lg">${s?.[key] || 0}</span>
+            <span class="font-bold text-lg" id="stat-${key}">${s?.[key] || 0}</span>
           </div>
-        `
-          )
-          .join('')}
+        `).join('')}
       </div>
 
       <!-- Recent orders -->
@@ -1040,6 +1036,24 @@ function recalculateStats() {
     shipped:       o.filter(x => x.status === 'shipped').length,
     delivered:     o.filter(x => x.status === 'delivered').length
   }
+
+  // Actualizar DOM si los elementos existen
+  const s = state.stats
+  const set = (id, val) => {
+    const el = document.getElementById(id)
+    if (el) el.textContent = val
+  }
+
+  set('stat-total',   s.total_orders)
+  set('stat-revenue', formatCOP(s.total_revenue))
+  set('stat-web',     s.web_orders)
+  set('stat-wa',      s.wa_orders)
+  set('stat-pending',             s.pending)
+  set('stat-paid_pending_review', s.paid_pending)
+  set('stat-confirmed',           s.confirmed)
+  set('stat-production',          s.production)
+  set('stat-shipped',             s.shipped)
+  set('stat-delivered',           s.delivered)
 }
 
 function updateOrderInState(updated) {
