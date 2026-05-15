@@ -9,7 +9,7 @@ const state = {
   view: 'dashboard',
   orders: [],
   stats: null,
-  filters: { status: 'all', batch: 'all', channel: 'all' },
+  filters: { status: 'all', batch: 'all', channel: 'all', month: 'all', search: '' },
   loading: false,
   creating: false,
 };
@@ -22,6 +22,16 @@ const STATUS_LABELS = {
   shipped: 'Enviado',
   delivered: 'Entregado',
   cancelled: 'Cancelado',
+};
+
+const STATUS_LIGHT = {
+  pending:             '#f97316',
+  paid_pending_review: '#22c55e',
+  confirmed:           '#22c55e',
+  production:          '#22c55e',
+  shipped:             '#22c55e',
+  delivered:           '#22c55e',
+  cancelled:           '#ef4444',
 };
 
 const formatCOP = (n) =>
@@ -63,7 +73,8 @@ function generateOrderId() {
 }
 
 function statusBadge(status) {
-  return `<span class="status-badge status-${status}">${STATUS_LABELS[status] || status}</span>`;
+  const dot = `<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${STATUS_LIGHT[status] || '#a1a1aa'};margin-right:5px;vertical-align:middle;flex-shrink:0;"></span>`;
+  return `<span class="status-badge status-${status}">${dot}${STATUS_LABELS[status] || status}</span>`;
 }
 
 function channelBadge(channel) {
@@ -341,8 +352,21 @@ function viewOrders() {
       return false;
     if (state.filters.channel !== 'all' && o.channel !== state.filters.channel)
       return false;
+    if (state.filters.month !== 'all') {
+      const orderMonth = new Date(o.created_at).toISOString().slice(0, 7);
+      if (orderMonth !== state.filters.month) return false;
+    }
+    if (state.filters.search) {
+      const q = state.filters.search.toLowerCase();
+      if (!o.name?.toLowerCase().includes(q) && !o.order_id?.toLowerCase().includes(q))
+        return false;
+    }
     return true;
   });
+
+  const availableMonths = [...new Set(
+    state.orders.map(o => new Date(o.created_at).toISOString().slice(0, 7))
+  )].sort().reverse();
 
   const totalFiltered = filtered.reduce((sum, o) => sum + (o.total || 0), 0);
 
@@ -358,6 +382,19 @@ function viewOrders() {
         </button>
       </div>
 
+      <!-- Barra de búsqueda -->
+      <div class="bg-white rounded-2xl border border-zinc-100 shadow-sm px-4 py-3 mb-3 flex items-center gap-3">
+        <svg class="w-4 h-4 text-zinc-400 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+        <input id="search-input" type="text" placeholder="Buscar por nombre o número de pedido..."
+               value="${state.filters.search}"
+               class="flex-1 text-sm outline-none placeholder-zinc-400" />
+        ${state.filters.search ? `
+          <button id="clear-search" class="text-zinc-400 hover:text-zinc-700 text-lg leading-none">×</button>
+        ` : ''}
+      </div>
+
       <!-- Filtros -->
       <div class="bg-white rounded-2xl border border-zinc-100 shadow-sm p-4 mb-4 flex flex-wrap gap-4 items-end">
         <div>
@@ -365,11 +402,19 @@ function viewOrders() {
           <select id="filter-status" class="border border-zinc-200 rounded-lg px-3 py-2 text-sm bg-white">
             <option value="all">Todos</option>
             ${Object.entries(STATUS_LABELS)
-              .map(
-                ([val, label]) =>
-                  `<option value="${val}" ${state.filters.status === val ? 'selected' : ''}>${label}</option>`
-              )
-              .join('')}
+              .map(([val, label]) =>
+                `<option value="${val}" ${state.filters.status === val ? 'selected' : ''}>${label}</option>`
+              ).join('')}
+          </select>
+        </div>
+        <div>
+          <label class="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">Mes</label>
+          <select id="filter-month" class="border border-zinc-200 rounded-lg px-3 py-2 text-sm bg-white">
+            <option value="all">Todos</option>
+            ${availableMonths.map(m => {
+              const label = new Date(m + '-02').toLocaleDateString('es-CO', { month: 'long', year: 'numeric' });
+              return `<option value="${m}" ${state.filters.month === m ? 'selected' : ''}>${label.charAt(0).toUpperCase() + label.slice(1)}</option>`;
+            }).join('')}
           </select>
         </div>
         <div>
@@ -771,12 +816,28 @@ function attachEvents() {
     state.filters.status = e.target.value;
     render();
   });
+  document.getElementById('filter-month')?.addEventListener('change', (e) => {
+    state.filters.month = e.target.value;
+    render();
+  });
   document.getElementById('filter-batch')?.addEventListener('change', (e) => {
     state.filters.batch = e.target.value;
     render();
   });
   document.getElementById('filter-channel')?.addEventListener('change', (e) => {
     state.filters.channel = e.target.value;
+    render();
+  });
+
+  // Búsqueda
+  document.getElementById('search-input')?.addEventListener('input', (e) => {
+    state.filters.search = e.target.value;
+    render();
+    const el = document.getElementById('search-input');
+    if (el) { el.focus(); el.setSelectionRange(el.value.length, el.value.length); }
+  });
+  document.getElementById('clear-search')?.addEventListener('click', () => {
+    state.filters.search = '';
     render();
   });
 
