@@ -31,13 +31,13 @@ export default async function handler(req, res) {
         name, email, whatsapp, city, address,
         batch_id, shipping_zone, quantity, photos_link, notes,
         subtotal, shipping, total,
-        payment_method, has_proof
+        payment_method, has_proof, status_changed_at
       ) VALUES (
         ${order_id}, 'web', ${payment_method === 'pay_now' ? 'paid_pending_review' : 'pending'},
         ${name}, ${email}, ${whatsapp}, ${city}, ${address},
         ${batch_id}, ${shipping_zone}, ${parseInt(quantity)}, ${photos_link}, ${notes || null},
         ${totals.subtotal}, ${totals.shipping}, ${totals.total},
-        ${payment_method}, ${proof ? true : false}
+        ${payment_method}, ${proof ? true : false}, NOW()
       )
     `
     // Descontar cupo del batch

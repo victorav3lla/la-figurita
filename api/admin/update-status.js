@@ -17,7 +17,7 @@ export default async function handler(req, res) {
       if (!validStatuses.includes(status)) {
         return res.status(400).json({ error: 'Estado inválido' })
       }
-      await sql`UPDATE orders SET status = ${status} WHERE order_id = ${order_id}`
+      await sql`UPDATE orders SET status = ${status}, status_changed_at = NOW() WHERE order_id = ${order_id}`
     }
 
     if (photos_link !== undefined) {

@@ -165,6 +165,28 @@ function getBatchLabel(id) {
   return BATCHES.find((b) => b.id === id)?.label || id;
 }
 
+function formatStatusAge(dateStr) {
+  if (!dateStr) return '—';
+  const changed = new Date(dateStr);
+  const now = new Date();
+  const diffMs = now - changed;
+  const days = Math.floor(diffMs / 86400000);
+  const hours = Math.floor(diffMs / 3600000);
+  const mins = Math.floor(diffMs / 60000);
+
+  const dateLabel = changed.toLocaleDateString('es-CO', { day: '2-digit', month: 'short' });
+  const timeLabel = changed.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
+
+  let age;
+  if (mins < 60)       age = `hace ${mins}m`;
+  else if (hours < 24) age = `hace ${hours}h`;
+  else if (days === 1) age = `ayer`;
+  else                 age = `${days}d`;
+
+  return `<span class="text-xs font-semibold text-zinc-700">${age}</span>
+          <span class="text-xs text-zinc-400 block">${dateLabel} ${timeLabel}</span>`;
+}
+
 // ─── Views ─────────────────────────────────────────────────────────────────
 
 function viewLogin() {
@@ -191,9 +213,47 @@ function viewLogin() {
   `;
 }
 
+function ordersTableByStatus(orders) {
+  if (!orders.length) {
+    return `<p class="text-center py-10 text-zinc-400 text-sm">No hay pedidos aún.</p>`;
+  }
+
+  const groups = {};
+  Object.keys(STATUS_LABELS).forEach(s => { groups[s] = []; });
+  orders.forEach(o => { if (groups[o.status]) groups[o.status].push(o); });
+
+  const sections = Object.entries(STATUS_LABELS)
+    .filter(([key]) => groups[key].length > 0)
+    .map(([key, label]) => {
+      const color = STATUS_LIGHT[key];
+      const icon = STATUS_ICONS[key];
+      const group = groups[key];
+      const count = group.length;
+      return `
+        <div class="mb-2">
+          <div class="flex items-center gap-3 px-6 py-3 border-b border-zinc-100"
+               style="background:${color}14;border-left:3px solid ${color}">
+            <span class="text-lg leading-none">${icon}</span>
+            <span class="font-bold text-sm" style="color:${color}">${label}</span>
+            <span class="ml-1 text-xs font-semibold px-2 py-0.5 rounded-full"
+                  style="background:${color}22;color:${color}">
+              ${count} pedido${count !== 1 ? 's' : ''}
+            </span>
+          </div>
+          <div class="overflow-x-auto">
+            ${ordersTable(group)}
+          </div>
+        </div>
+      `;
+    });
+
+  return sections.length
+    ? sections.join('')
+    : `<p class="text-center py-10 text-zinc-400 text-sm">No hay pedidos aún.</p>`;
+}
+
 function viewDashboard() {
   const s = state.stats;
-  const recent = state.orders.slice(0, 10);
 
   return `
     <div class="p-6 max-w-7xl mx-auto">
@@ -252,15 +312,13 @@ function viewDashboard() {
         `).join('')}
       </div>
 
-      <!-- Recent orders -->
+      <!-- Recent orders by status -->
       <div class="bg-white rounded-2xl border border-zinc-100 shadow-sm overflow-hidden">
         <div class="flex items-center justify-between px-6 py-4 border-b border-zinc-100">
           <h2 class="font-display font-bold text-lg">Pedidos recientes</h2>
           <button data-view="orders" class="nav-btn text-sm text-zinc-500 hover:text-zinc-900 transition">Ver todos →</button>
         </div>
-        <div class="overflow-x-auto">
-          ${ordersTable(recent)}
-        </div>
+        ${ordersTableByStatus(state.orders)}
       </div>
     </div>
   `;
@@ -387,6 +445,7 @@ function ordersTable(orders) {
           <th class="px-4 py-3 font-semibold">Total</th>
           <th class="px-4 py-3 font-semibold">Canal</th>
           <th class="px-4 py-3 font-semibold">Estado</th>
+          <th class="px-4 py-3 font-semibold">En estado</th>
           <th class="px-4 py-3 font-semibold">Fecha</th>
           <th class="px-4 py-3"></th>
         </tr>
@@ -406,6 +465,7 @@ function ordersTable(orders) {
             <td class="px-4 py-3 font-bold">${formatCOP(o.total)}</td>
             <td class="px-4 py-3">${channelBadge(o.channel)}</td>
             <td class="px-4 py-3 status-cell" data-order-id="${o.order_id}">${statusCellHtml(o.status)}</td>
+            <td class="px-4 py-3 leading-tight">${formatStatusAge(o.status_changed_at)}</td>
             <td class="px-4 py-3 text-xs text-zinc-400">${formatDate(o.created_at)}</td>
             <td class="px-4 py-3">
               <a href="https://wa.me/${o.whatsapp?.replace(/\D/g, '')}"

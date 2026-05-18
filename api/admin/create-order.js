@@ -19,13 +19,13 @@ export default async function handler(req, res) {
         order_id, channel, status,
         name, email, whatsapp, city, address,
         batch_id, shipping_zone, quantity, photos_link, notes,
-        subtotal, shipping, total, payment_method
+        subtotal, shipping, total, payment_method, status_changed_at
       ) VALUES (
         ${order_id}, 'whatsapp', ${status || 'pending'},
         ${name}, ${email || ''}, ${whatsapp}, ${city}, ${address},
         ${batch_id}, ${shipping_zone}, ${parseInt(quantity)},
         ${photos_link || null}, ${notes || null},
-        ${parseInt(subtotal)}, ${parseInt(shipping)}, ${parseInt(total)}, 'whatsapp'
+        ${parseInt(subtotal)}, ${parseInt(shipping)}, ${parseInt(total)}, 'whatsapp', NOW()
       )
     `
     await sql`
