@@ -44,12 +44,24 @@ const STATUS_LIGHT = {
   cancelled:           '#ef4444',
 };
 
+const REVENUE_STATUSES = ['paid_pending_review', 'confirmed', 'production', 'shipped', 'delivered'];
+
+// Tasa de conversión CLP → COP (actualizar según el mercado)
+const CLP_TO_COP = 4.35;
+
 const formatCOP = (n) =>
   new Intl.NumberFormat('es-CO', {
     style: 'currency',
     currency: 'COP',
     maximumFractionDigits: 0,
   }).format(n || 0);
+
+function orderTotalInCOP(order) {
+  const batch = BATCHES.find(b => b.id === order.batch_id);
+  const currency = batch?.currency || 'COP';
+  const total = parseInt(order.total) || 0;
+  return currency === 'CLP' ? Math.round(total * CLP_TO_COP) : total;
+}
 
 // ─── API ───────────────────────────────────────────────────────────────────
 
@@ -484,8 +496,8 @@ function ordersTable(orders) {
   `;
 }
 
-function viewOrders() {
-  const filtered = state.orders.filter((o) => {
+function getFilteredOrders() {
+  return state.orders.filter((o) => {
     if (state.filters.status !== 'all' && o.status !== state.filters.status)
       return false;
     if (state.filters.batch !== 'all' && o.batch_id !== state.filters.batch)
@@ -503,12 +515,18 @@ function viewOrders() {
     }
     return true;
   });
+}
+
+function viewOrders() {
+  const filtered = getFilteredOrders();
 
   const availableMonths = [...new Set(
     state.orders.map(o => new Date(o.created_at).toISOString().slice(0, 7))
   )].sort().reverse();
 
-  const totalFiltered = filtered.reduce((sum, o) => sum + (o.total || 0), 0);
+  const confirmedTotal = filtered
+    .filter(o => REVENUE_STATUSES.includes(o.status))
+    .reduce((sum, o) => sum + orderTotalInCOP(o), 0);
 
   return `
     <div class="p-6 max-w-7xl mx-auto">
@@ -517,9 +535,17 @@ function viewOrders() {
           <button data-view="dashboard" class="nav-btn text-zinc-500 text-sm hover:text-zinc-900 transition mb-1">← Dashboard</button>
           <h1 class="font-display font-black text-2xl">Todos los pedidos</h1>
         </div>
-        <button data-view="create" class="nav-btn bg-zinc-900 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-zinc-700 transition">
-          + Nuevo pedido
-        </button>
+        <div class="flex gap-2">
+          <button id="export-excel" class="bg-emerald-600 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-emerald-700 transition">
+            ↓ Excel
+          </button>
+          <button id="export-pdf" class="bg-blue-600 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-blue-700 transition">
+            ↓ PDF
+          </button>
+          <button data-view="create" class="nav-btn bg-zinc-900 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-zinc-700 transition">
+            + Nuevo pedido
+          </button>
+        </div>
       </div>
 
       <!-- Barra de búsqueda -->
@@ -573,8 +599,8 @@ function viewOrders() {
           </select>
         </div>
         <div class="ml-auto text-right">
-          <p class="text-xs text-zinc-400">${filtered.length} pedido(s)</p>
-          <p class="font-bold">${formatCOP(totalFiltered)}</p>
+          <p class="text-xs text-zinc-400">${filtered.length} pedido(s) · pagos confirmados</p>
+          <p class="font-bold">${formatCOP(confirmedTotal)}</p>
         </div>
       </div>
 
@@ -859,6 +885,112 @@ function orderDetailPanel(order, editMode = false) {
   `
 }
 
+// ─── Exportar ───────────────────────────────────────────────────────────────
+
+function ordersToRows(orders) {
+  return orders.map(o => {
+    const batch = BATCHES.find(b => b.id === o.batch_id);
+    const currency = batch?.currency || 'COP';
+    const totalCOP = orderTotalInCOP(o);
+    return {
+      'Pedido':          o.order_id,
+      'Nombre':          o.name,
+      'WhatsApp':        o.whatsapp,
+      'Email':           o.email || '',
+      'Ciudad':          o.city || '',
+      'Batch':           getBatchLabel(o.batch_id),
+      'Cantidad':        o.quantity,
+      'Total original':  o.total,
+      'Moneda':          currency,
+      'Total COP':       totalCOP,
+      'Canal':           o.channel,
+      'Estado':          STATUS_LABELS[o.status] || o.status,
+      'En estado desde': o.status_changed_at ? new Date(o.status_changed_at).toLocaleString('es-CO') : '',
+      'Fecha pedido':    o.created_at ? new Date(o.created_at).toLocaleString('es-CO') : '',
+    };
+  });
+}
+
+async function exportToExcel(orders) {
+  const btn = document.getElementById('export-excel');
+  const orig = btn.textContent;
+  btn.textContent = 'Cargando...';
+  btn.disabled = true;
+
+  try {
+    if (!window.XLSX) {
+      await new Promise((resolve, reject) => {
+        const s = document.createElement('script');
+        s.src = 'https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js';
+        s.onload = resolve;
+        s.onerror = reject;
+        document.head.appendChild(s);
+      });
+    }
+
+    const rows = ordersToRows(orders);
+    const ws = window.XLSX.utils.json_to_sheet(rows);
+    const wb = window.XLSX.utils.book_new();
+    window.XLSX.utils.book_append_sheet(wb, ws, 'Pedidos');
+
+    // Ancho de columnas automático
+    const colWidths = Object.keys(rows[0] || {}).map(k => ({
+      wch: Math.max(k.length, ...rows.map(r => String(r[k] || '').length))
+    }));
+    ws['!cols'] = colWidths;
+
+    const date = new Date().toISOString().slice(0, 10);
+    window.XLSX.writeFile(wb, `pedidos-la-figurita-${date}.xlsx`);
+  } catch {
+    alert('Error al exportar a Excel.');
+  } finally {
+    btn.textContent = orig;
+    btn.disabled = false;
+  }
+}
+
+function exportToPDF(orders) {
+  const rows = ordersToRows(orders);
+  const date = new Date().toLocaleDateString('es-CO', { day: '2-digit', month: 'long', year: 'numeric' });
+
+  const headers = Object.keys(rows[0] || {});
+  const headerRow = headers.map(h => `<th>${h}</th>`).join('');
+  const bodyRows = rows.map(r =>
+    `<tr>${headers.map(h => `<td>${r[h] ?? ''}</td>`).join('')}</tr>`
+  ).join('');
+
+  const html = `<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Pedidos La Figurita</title>
+  <style>
+    body { font-family: Arial, sans-serif; font-size: 10px; margin: 20px; color: #111; }
+    h1 { font-size: 16px; margin-bottom: 4px; }
+    p { font-size: 10px; color: #666; margin-bottom: 12px; }
+    table { width: 100%; border-collapse: collapse; }
+    th { background: #18181b; color: white; padding: 5px 6px; text-align: left; font-size: 9px; }
+    td { padding: 4px 6px; border-bottom: 1px solid #e4e4e7; font-size: 9px; }
+    tr:nth-child(even) td { background: #f9f9f9; }
+    @media print { body { margin: 10px; } }
+  </style>
+</head>
+<body>
+  <h1>La Figurita · Pedidos</h1>
+  <p>Exportado el ${date} · ${rows.length} pedido(s)</p>
+  <table>
+    <thead><tr>${headerRow}</tr></thead>
+    <tbody>${bodyRows}</tbody>
+  </table>
+  <script>window.onload = () => { window.print(); }<\/script>
+</body>
+</html>`;
+
+  const w = window.open('', '_blank');
+  w.document.write(html);
+  w.document.close();
+}
+
 // ─── Render ─────────────────────────────────────────────────────────────────
 
 function render() {
@@ -931,6 +1063,16 @@ function attachEvents() {
   });
 
 
+
+  // Exportar
+  document.getElementById('export-excel')?.addEventListener('click', () => {
+    const filtered = getFilteredOrders();
+    exportToExcel(filtered);
+  });
+  document.getElementById('export-pdf')?.addEventListener('click', () => {
+    const filtered = getFilteredOrders();
+    exportToPDF(filtered);
+  });
 
   // Filtros
   document.getElementById('filter-status')?.addEventListener('change', (e) => {
@@ -1226,15 +1368,12 @@ function openDetailPanel(order, editMode = false) {
 function recalculateStats() {
   const o = state.orders
 
-  const revenueStatuses = ['paid_pending_review', 'confirmed', 'production', 'shipped', 'delivered']
-  const pendingStatuses = ['pending']
-
   state.stats = {
     total_orders:        o.length,
-    total_revenue:       o.filter(x => revenueStatuses.includes(x.status))
-                          .reduce((sum, x) => sum + (parseInt(x.total) || 0), 0),
-    pending_revenue:     o.filter(x => pendingStatuses.includes(x.status))
-                          .reduce((sum, x) => sum + (parseInt(x.total) || 0), 0),
+    total_revenue:       o.filter(x => REVENUE_STATUSES.includes(x.status))
+                          .reduce((sum, x) => sum + orderTotalInCOP(x), 0),
+    pending_revenue:     o.filter(x => x.status === 'pending')
+                          .reduce((sum, x) => sum + orderTotalInCOP(x), 0),
     web_orders:          o.filter(x => x.channel === 'web').length,
     wa_orders:           o.filter(x => x.channel === 'whatsapp').length,
     pending:             o.filter(x => x.status === 'pending').length,
