@@ -244,7 +244,7 @@ function ordersTableByStatus(orders) {
       return `
         <div class="mb-2">
           <div class="flex items-center gap-3 px-6 py-3 border-b border-zinc-100"
-               style="background:${color}14;border-left:3px solid ${color}">
+               style="background:${color}30;border-left:4px solid ${color}">
             <span class="text-lg leading-none">${icon}</span>
             <span class="font-bold text-sm" style="color:${color}">${label}</span>
             <span class="ml-1 text-xs font-semibold px-2 py-0.5 rounded-full"

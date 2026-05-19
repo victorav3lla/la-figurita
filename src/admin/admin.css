@@ -30,13 +30,13 @@ html, body {
 .status-delivered           { background: #bbf7d0; color: #14532d; }
 .status-cancelled           { background: #fee2e2; color: #7f1d1d; }
 
-.row-pending             { background-color: #fff7ed; }
-.row-confirmed           { background-color: #f0f9ff; }
-.row-paid_pending_review { background-color: #f5f3ff; }
-.row-production          { background-color: #f0f9ff; }
-.row-shipped             { background-color: #ecfeff; }
-.row-delivered           { background-color: #f0fdf4; }
-.row-cancelled           { background-color: #fef2f2; }
+.row-pending             { background-color: #ffedd5; }
+.row-confirmed           { background-color: #e0f2fe; }
+.row-paid_pending_review { background-color: #ede9fe; }
+.row-production          { background-color: #dbeafe; }
+.row-shipped             { background-color: #cffafe; }
+.row-delivered           { background-color: #dcfce7; }
+.row-cancelled           { background-color: #fee2e2; }
 .row-pending:hover, .row-confirmed:hover, .row-paid_pending_review:hover,
 .row-production:hover, .row-shipped:hover, .row-delivered:hover, .row-cancelled:hover {
   filter: brightness(0.96);
