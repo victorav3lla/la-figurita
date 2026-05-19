@@ -598,9 +598,19 @@ function viewOrders() {
             <option value="whatsapp"  ${state.filters.channel === 'whatsapp' ? 'selected' : ''}>WhatsApp</option>
           </select>
         </div>
-        <div class="ml-auto text-right">
-          <p class="text-xs text-zinc-400">${filtered.length} pedido(s) · pagos confirmados</p>
-          <p class="font-bold">${formatCOP(confirmedTotal)}</p>
+        <div class="ml-auto flex gap-4 items-end">
+          <div class="text-right">
+            <p class="text-xs text-zinc-400 uppercase tracking-wider font-semibold">Pedidos</p>
+            <p class="font-black text-2xl leading-none">${filtered.length}</p>
+          </div>
+          <div class="text-right">
+            <p class="text-xs text-zinc-400 uppercase tracking-wider font-semibold">Confirmados</p>
+            <p class="font-black text-2xl leading-none">${filtered.filter(o => REVENUE_STATUSES.includes(o.status)).length}</p>
+          </div>
+          <div class="text-right">
+            <p class="text-xs text-zinc-400 uppercase tracking-wider font-semibold">Total confirmado</p>
+            <p class="font-black text-xl leading-none text-emerald-600">${formatCOP(confirmedTotal)}</p>
+          </div>
         </div>
       </div>
 
