@@ -11,8 +11,8 @@ const BATCHES_FALLBACK = [
     country: 'CO',
     discount: true,
     discountLabel: 'Lanzamiento',
-    spots: 50,
-    spotsLeft: 46,
+    spots: 15,
+    spotsLeft: 11,
     active: true
   },
   {
@@ -24,8 +24,8 @@ const BATCHES_FALLBACK = [
     currency: 'COP',
     country: 'CO',
     discount: false,
-    spots: 50,
-    spotsLeft: 50,
+    spots: 15,
+    spotsLeft: 15,
     active: true
   },
   {
@@ -37,8 +37,8 @@ const BATCHES_FALLBACK = [
     currency: 'COP',
     country: 'CO',
     discount: false,
-    spots: 50,
-    spotsLeft: 50,
+    spots: 15,
+    spotsLeft: 15,
     active: true
   },
   {
@@ -51,8 +51,8 @@ const BATCHES_FALLBACK = [
     country: 'CL',
     discount: true,
     discountLabel: 'Lanzamiento',
-    spots: 20,
-    spotsLeft: 19,
+    spots: 15,
+    spotsLeft: 14,
     active: true
   },
   {
@@ -64,8 +64,8 @@ const BATCHES_FALLBACK = [
     currency: 'CLP',
     country: 'CL',
     discount: false,
-    spots: 20,
-    spotsLeft: 20,
+    spots: 15,
+    spotsLeft: 15,
     active: true
   }
 ]

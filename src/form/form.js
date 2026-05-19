@@ -6,15 +6,16 @@ const PAYMENT_INFO = {
   nequi: {
     name: 'Nequi',
     number: '321 499 7957',
-    holder: 'Victor Avella',
+    holder: 'Victor Avella'
   },
   bancolombia: {
     name: 'Bancolombia Ahorros',
     account: '691-577765-76',
     holder: 'Victor Avella',
     cc: '1.019.081.891',
-  },
-};
+    llave: '321 499 7957'
+  }
+}
 
 export function orderForm() {
   const batches = activeBatches();
@@ -254,6 +255,7 @@ export function orderForm() {
                     <p><strong>${PAYMENT_INFO.bancolombia.account}</strong></p>
                     <p class="text-ink-soft text-sm">Ahorros · ${PAYMENT_INFO.bancolombia.holder}</p>
                     <p class="text-ink-soft text-sm">CC ${PAYMENT_INFO.bancolombia.cc}</p>
+                    <p class="text-ink-soft text-sm">🔑 Llave: ${PAYMENT_INFO.bancolombia.llave}</p>
                   </div>
                   <button class="copy-btn" data-copy="${PAYMENT_INFO.bancolombia.account}">
                     Copiar cuenta

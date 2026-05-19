@@ -9,7 +9,7 @@ const state = {
   view: 'dashboard',
   orders: [],
   stats: null,
-  filters: { status: 'all', batch: 'all', channel: 'all', month: 'all', search: '' },
+  filters: { status: [], batch: [], channel: [], month: [], search: '' },
   loading: false,
   creating: false,
 };
@@ -498,20 +498,16 @@ function ordersTable(orders) {
 
 function getFilteredOrders() {
   return state.orders.filter((o) => {
-    if (state.filters.status !== 'all' && o.status !== state.filters.status)
-      return false;
-    if (state.filters.batch !== 'all' && o.batch_id !== state.filters.batch)
-      return false;
-    if (state.filters.channel !== 'all' && o.channel !== state.filters.channel)
-      return false;
-    if (state.filters.month !== 'all') {
+    if (state.filters.status.length && !state.filters.status.includes(o.status)) return false;
+    if (state.filters.batch.length  && !state.filters.batch.includes(o.batch_id)) return false;
+    if (state.filters.channel.length && !state.filters.channel.includes(o.channel)) return false;
+    if (state.filters.month.length) {
       const orderMonth = new Date(o.created_at).toISOString().slice(0, 7);
-      if (orderMonth !== state.filters.month) return false;
+      if (!state.filters.month.includes(orderMonth)) return false;
     }
     if (state.filters.search) {
       const q = state.filters.search.toLowerCase();
-      if (!o.name?.toLowerCase().includes(q) && !o.order_id?.toLowerCase().includes(q))
-        return false;
+      if (!o.name?.toLowerCase().includes(q) && !o.order_id?.toLowerCase().includes(q)) return false;
     }
     return true;
   });
@@ -562,55 +558,88 @@ function viewOrders() {
       </div>
 
       <!-- Filtros -->
-      <div class="bg-white rounded-2xl border border-zinc-100 shadow-sm p-4 mb-4 flex flex-wrap gap-4 items-end">
-        <div>
-          <label class="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">Estado</label>
-          <select id="filter-status" class="border border-zinc-200 rounded-lg px-3 py-2 text-sm bg-white">
-            <option value="all">Todos</option>
-            ${Object.entries(STATUS_LABELS)
-              .map(([val, label]) =>
-                `<option value="${val}" ${state.filters.status === val ? 'selected' : ''}>${label}</option>`
-              ).join('')}
-          </select>
-        </div>
-        <div>
-          <label class="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">Mes</label>
-          <select id="filter-month" class="border border-zinc-200 rounded-lg px-3 py-2 text-sm bg-white">
-            <option value="all">Todos</option>
-            ${availableMonths.map(m => {
-              const label = new Date(m + '-02').toLocaleDateString('es-CO', { month: 'long', year: 'numeric' });
-              return `<option value="${m}" ${state.filters.month === m ? 'selected' : ''}>${label.charAt(0).toUpperCase() + label.slice(1)}</option>`;
-            }).join('')}
-          </select>
-        </div>
-        <div>
-          <label class="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">Batch</label>
-          <select id="filter-batch" class="border border-zinc-200 rounded-lg px-3 py-2 text-sm bg-white">
-            <option value="all">Todos</option>
-            ${BATCHES.map((b) => `<option value="${b.id}" ${state.filters.batch === b.id ? 'selected' : ''}>${b.label}</option>`).join('')}
-          </select>
-        </div>
-        <div>
-          <label class="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-1">Canal</label>
-          <select id="filter-channel" class="border border-zinc-200 rounded-lg px-3 py-2 text-sm bg-white">
-            <option value="all">Todos</option>
-            <option value="web"       ${state.filters.channel === 'web' ? 'selected' : ''}>Web</option>
-            <option value="whatsapp"  ${state.filters.channel === 'whatsapp' ? 'selected' : ''}>WhatsApp</option>
-          </select>
-        </div>
-        <div class="ml-auto flex gap-4 items-end">
-          <div class="text-right">
-            <p class="text-xs text-zinc-400 uppercase tracking-wider font-semibold">Pedidos</p>
-            <p class="font-black text-2xl leading-none">${filtered.length}</p>
+      <div class="bg-white rounded-2xl border border-zinc-100 shadow-sm p-4 mb-4">
+        <div class="flex flex-wrap gap-y-4 gap-x-6 mb-4">
+
+          <div>
+            <label class="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-2">Estado</label>
+            <div class="flex flex-wrap gap-1.5">
+              ${Object.entries(STATUS_LABELS).map(([val, label]) => {
+                const active = state.filters.status.includes(val);
+                const color = STATUS_LIGHT[val];
+                return `<button class="filter-chip filter-status-chip text-xs font-semibold px-2.5 py-1 rounded-full border transition-all"
+                                data-key="status" data-val="${val}"
+                                style="${active ? `background:${color};border-color:${color};color:white` : 'background:white;border-color:#e4e4e7;color:#52525b'}">
+                  ${STATUS_ICONS[val]} ${label}
+                </button>`;
+              }).join('')}
+            </div>
           </div>
-          <div class="text-right">
-            <p class="text-xs text-zinc-400 uppercase tracking-wider font-semibold">Confirmados</p>
-            <p class="font-black text-2xl leading-none">${filtered.filter(o => REVENUE_STATUSES.includes(o.status)).length}</p>
+
+          <div>
+            <label class="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-2">Canal</label>
+            <div class="flex flex-wrap gap-1.5">
+              ${[{val:'web',label:'🌐 Web'},{val:'whatsapp',label:'💬 WhatsApp'}].map(({val, label}) => {
+                const active = state.filters.channel.includes(val);
+                return `<button class="filter-chip text-xs font-semibold px-2.5 py-1 rounded-full border transition-all"
+                                data-key="channel" data-val="${val}"
+                                style="${active ? 'background:#18181b;border-color:#18181b;color:white' : 'background:white;border-color:#e4e4e7;color:#52525b'}">
+                  ${label}
+                </button>`;
+              }).join('')}
+            </div>
           </div>
-          <div class="text-right">
-            <p class="text-xs text-zinc-400 uppercase tracking-wider font-semibold">Total confirmado</p>
-            <p class="font-black text-xl leading-none text-emerald-600">${formatCOP(confirmedTotal)}</p>
+
+        </div>
+        <div class="flex flex-wrap gap-y-4 gap-x-6 items-end">
+
+          <div>
+            <label class="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-2">Batch</label>
+            <div class="flex flex-wrap gap-1.5">
+              ${BATCHES.map(b => {
+                const active = state.filters.batch.includes(b.id);
+                return `<button class="filter-chip text-xs font-semibold px-2.5 py-1 rounded-full border transition-all"
+                                data-key="batch" data-val="${b.id}"
+                                style="${active ? 'background:#18181b;border-color:#18181b;color:white' : 'background:white;border-color:#e4e4e7;color:#52525b'}">
+                  ${b.label}
+                </button>`;
+              }).join('')}
+            </div>
           </div>
+
+          <div>
+            <label class="text-xs font-semibold text-zinc-500 uppercase tracking-wider block mb-2">Mes</label>
+            <div class="flex flex-wrap gap-1.5">
+              ${availableMonths.map(m => {
+                const label = new Date(m + '-02').toLocaleDateString('es-CO', { month: 'long', year: 'numeric' });
+                const active = state.filters.month.includes(m);
+                return `<button class="filter-chip text-xs font-semibold px-2.5 py-1 rounded-full border transition-all"
+                                data-key="month" data-val="${m}"
+                                style="${active ? 'background:#18181b;border-color:#18181b;color:white' : 'background:white;border-color:#e4e4e7;color:#52525b'}">
+                  ${label.charAt(0).toUpperCase() + label.slice(1)}
+                </button>`;
+              }).join('')}
+            </div>
+          </div>
+
+          <div class="ml-auto flex gap-4 items-end">
+            ${(state.filters.status.length || state.filters.batch.length || state.filters.channel.length || state.filters.month.length) ? `
+              <button id="clear-filters" class="text-xs text-zinc-400 hover:text-zinc-700 transition self-end mb-1">Limpiar filtros ×</button>
+            ` : ''}
+            <div class="text-right">
+              <p class="text-xs text-zinc-400 uppercase tracking-wider font-semibold">Pedidos</p>
+              <p class="font-black text-2xl leading-none">${filtered.length}</p>
+            </div>
+            <div class="text-right">
+              <p class="text-xs text-zinc-400 uppercase tracking-wider font-semibold">Confirmados</p>
+              <p class="font-black text-2xl leading-none">${filtered.filter(o => REVENUE_STATUSES.includes(o.status)).length}</p>
+            </div>
+            <div class="text-right">
+              <p class="text-xs text-zinc-400 uppercase tracking-wider font-semibold">Total confirmado</p>
+              <p class="font-black text-xl leading-none text-emerald-600">${formatCOP(confirmedTotal)}</p>
+            </div>
+          </div>
+
         </div>
       </div>
 
@@ -1084,21 +1113,22 @@ function attachEvents() {
     exportToPDF(filtered);
   });
 
-  // Filtros
-  document.getElementById('filter-status')?.addEventListener('change', (e) => {
-    state.filters.status = e.target.value;
-    render();
+  // Filtros chips (multi-select)
+  document.querySelectorAll('.filter-chip').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const key = btn.dataset.key;
+      const val = btn.dataset.val;
+      const arr = state.filters[key];
+      const idx = arr.indexOf(val);
+      if (idx === -1) arr.push(val); else arr.splice(idx, 1);
+      render();
+    });
   });
-  document.getElementById('filter-month')?.addEventListener('change', (e) => {
-    state.filters.month = e.target.value;
-    render();
-  });
-  document.getElementById('filter-batch')?.addEventListener('change', (e) => {
-    state.filters.batch = e.target.value;
-    render();
-  });
-  document.getElementById('filter-channel')?.addEventListener('change', (e) => {
-    state.filters.channel = e.target.value;
+  document.getElementById('clear-filters')?.addEventListener('click', () => {
+    state.filters.status = [];
+    state.filters.batch = [];
+    state.filters.channel = [];
+    state.filters.month = [];
     render();
   });
 
