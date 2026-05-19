@@ -379,16 +379,21 @@ async function loadAdminBatches() {
                  value="${b.delivery}" placeholder="ej. 22 de mayo" />
         </div>
       </div>
-      <div class="grid grid-cols-3 gap-4">
+      <div class="grid grid-cols-4 gap-4">
         <div>
           <label class="detail-sublabel">Precio</label>
           <input type="number" class="input text-sm" id="price-${b.id}"
                  value="${b.price}" />
         </div>
         <div>
+          <label class="detail-sublabel">Cupos totales</label>
+          <input type="number" class="input text-sm" id="total-spots-${b.id}"
+                 value="${b.spots}" min="1" />
+        </div>
+        <div>
           <label class="detail-sublabel">Cupos disponibles</label>
           <input type="number" class="input text-sm" id="spots-${b.id}"
-                 value="${b.spots_left}" min="0" max="${b.spots}" />
+                 value="${b.spots_left}" min="0" />
         </div>
         <div class="flex items-end">
           <button class="batch-save-btn w-full bg-zinc-900 text-white font-bold py-2.5 rounded-xl hover:bg-zinc-700 transition text-sm"
@@ -416,18 +421,19 @@ async function loadAdminBatches() {
   // Listeners de guardar
   document.querySelectorAll('.batch-save-btn').forEach(btn => {
     btn.addEventListener('click', async () => {
-      const id        = btn.dataset.batchId
-      const spotsLeft = document.getElementById(`spots-${id}`).value
-      const price     = document.getElementById(`price-${id}`).value
-      const deadline  = document.getElementById(`deadline-${id}`).value
-      const delivery  = document.getElementById(`delivery-${id}`).value
-      const active    = document.querySelector(`.batch-active-toggle[data-batch-id="${id}"]`).checked
+      const id         = btn.dataset.batchId
+      const spots      = document.getElementById(`total-spots-${id}`).value
+      const spotsLeft  = document.getElementById(`spots-${id}`).value
+      const price      = document.getElementById(`price-${id}`).value
+      const deadline   = document.getElementById(`deadline-${id}`).value
+      const delivery   = document.getElementById(`delivery-${id}`).value
+      const active     = document.querySelector(`.batch-active-toggle[data-batch-id="${id}"]`).checked
 
       btn.textContent = 'Guardando...'
       btn.disabled    = true
 
       try {
-        await api('/api/admin/batches', 'POST', { id, spots_left: spotsLeft, price, deadline, delivery, active })
+        await api('/api/admin/batches', 'POST', { id, spots, spots_left: spotsLeft, price, deadline, delivery, active })
         btn.textContent = '¡Guardado!'
         setTimeout(() => {
           btn.textContent = 'Guardar'
